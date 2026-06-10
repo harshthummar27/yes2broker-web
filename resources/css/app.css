@@ -1,0 +1,133 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Segoe UI', ui-sans-serif, system-ui, sans-serif;
+    --color-y2b-primary: #001b73;
+    --color-y2b-primary-dark: #091646;
+    --color-y2b-accent: #f5a400;
+    --color-y2b-light: #d8e3ff;
+    --color-y2b-footer: #202020;
+}
+
+/* Marquee */
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.marquee-track {
+    animation: marquee 30s linear infinite;
+}
+
+.marquee-track:hover {
+    animation-play-state: paused;
+}
+
+/* Partner scroll */
+@keyframes partner-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.partner-track {
+    animation: partner-scroll 25s linear infinite;
+}
+
+/* Property carousel */
+.property-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.property-carousel {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Hero video overlay */
+.hero-overlay {
+    background: linear-gradient(180deg, rgba(0, 27, 115, 0.55) 0%, rgba(0, 27, 115, 0.75) 100%);
+}
+
+/* Nav active */
+.nav-link.active {
+    color: var(--color-y2b-primary);
+    font-weight: 600;
+}
+
+/* USP cards */
+.usp-card {
+    background: linear-gradient(135deg, #f8faff 0%, #eef3ff 100%);
+    border: 1px solid #e2eaff;
+}
+
+/* Location chips */
+.location-chip {
+    background: linear-gradient(90deg, #38b9e4, #c8efff);
+}
+
+/* Form section */
+.consultation-section {
+    background: linear-gradient(135deg, #001b73 0%, #003b88 100%);
+}
+
+/* Homepage About Company image */
+.about-company-image-box {
+    background: linear-gradient(145deg, #001b73 0%, #003b88 55%, #001b73 100%);
+}
+
+/* Consultation popup */
+.consultation-modal-brand {
+    background: linear-gradient(135deg, #001b73 0%, #003b88 100%);
+}
+
+#consultation-modal.is-open {
+    display: flex;
+}
+
+body.consultation-modal-open {
+    overflow: hidden;
+}
+
+/* Property card hover */
+/* EMI calculator sliders */
+.emi-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    outline: none;
+}
+
+.emi-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-y2b-primary);
+    border: 3px solid #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.emi-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-y2b-primary);
+    border: 3px solid #fff;
+    cursor: pointer;
+}
+
+.property-card:hover .property-card-image {
+    transform: scale(1.05);
+}
+
+.property-card-image {
+    transition: transform 0.4s ease;
+}
