@@ -5,8 +5,19 @@ Real estate brokerage platform converted from WordPress ([yes2broker.in](https:/
 ## Requirements
 
 - PHP 8.2+ (XAMPP)
-- MySQL 5.7+ / MariaDB
+- PHP extensions: `intl`, `mbstring`, `openssl`, `pdo_sqlite` or `pdo_mysql`, `fileinfo`, `zip`
+- MySQL 5.7+ / MariaDB (or SQLite for local dev)
 - Composer (included as `composer.phar`)
+
+### Enable `intl` extension (required for admin panel)
+
+In `C:\xampp\php\php.ini`, uncomment:
+
+```ini
+extension=intl
+```
+
+Then **restart** `artisan serve` or Apache. Without `intl`, `/admin` will show a 500 error.
 
 ## Local Setup
 
@@ -42,6 +53,23 @@ C:\xampp\php\php.exe artisan storage:link
 
 - **XAMPP Apache:** http://localhost/yes2broker/public
 - **Artisan serve:** `C:\xampp\php\php.exe artisan serve` → http://127.0.0.1:8000
+
+## Admin Panel (Properties)
+
+URL: `http://127.0.0.1:8000/admin` or `http://localhost/yes2broker/public/admin`
+
+| Field | Value |
+|-------|-------|
+| Email | `admin@yes2broker.in` |
+| Password | `password` |
+
+Change the password after first login. The admin panel lets you add, edit, and delete properties. The public site reads from the database automatically.
+
+Seed properties again:
+
+```powershell
+C:\xampp\php\php.exe artisan db:seed --class=PropertySeeder
+```
 
 ## Documentation
 

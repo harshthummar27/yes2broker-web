@@ -131,3 +131,21 @@ body.consultation-modal-open {
 .property-card-image {
     transition: transform 0.4s ease;
 }
+
+/* Property detail gallery */
+.property-gallery-thumbs {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.property-gallery-thumbs::-webkit-scrollbar {
+    display: none;
+}
+
+.property-gallery-thumb {
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+}
+
+#property-inquiry-modal.is-open {
+    display: flex;
+}

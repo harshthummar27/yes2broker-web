@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initLoadMore();
     initEmiCalculator();
     initConsultationModal();
+    initPropertyGallery();
+    initPropertyFaq();
+    initPropertyInquiryModal();
 });
 
 function initMobileMenu() {
@@ -271,6 +274,98 @@ function initEmiCalculator() {
     });
 
     calculate();
+}
+
+function initPropertyGallery() {
+    const main = document.getElementById('property-gallery-main');
+    const thumbs = document.querySelectorAll('[data-property-gallery-thumb]');
+
+    if (!main || thumbs.length === 0) return;
+
+    thumbs.forEach((thumb) => {
+        thumb.addEventListener('click', () => {
+            const image = thumb.dataset.image;
+            if (!image) return;
+
+            main.src = image;
+            main.alt = main.alt || '';
+
+            thumbs.forEach((item) => {
+                const isActive = item === thumb;
+                item.classList.toggle('border-y2b-primary', isActive);
+                item.classList.toggle('border-transparent', !isActive);
+                item.classList.toggle('opacity-70', !isActive);
+                item.classList.toggle('opacity-100', isActive);
+            });
+        });
+    });
+}
+
+function initPropertyFaq() {
+    const root = document.getElementById('property-faq-accordion');
+    if (!root) return;
+
+    const triggers = root.querySelectorAll('[data-property-faq-trigger]');
+
+    triggers.forEach((trigger) => {
+        trigger.addEventListener('click', () => {
+            const index = trigger.dataset.propertyFaqTrigger;
+            const panel = root.querySelector(`[data-property-faq-panel="${index}"]`);
+            const icon = root.querySelector(`[data-property-faq-icon="${index}"]`);
+
+            if (!panel) return;
+
+            const isOpen = !panel.classList.contains('hidden');
+
+            root.querySelectorAll('[data-property-faq-panel]').forEach((p) => p.classList.add('hidden'));
+            root.querySelectorAll('[data-property-faq-trigger]').forEach((t) => t.classList.remove('bg-gray-50'));
+            root.querySelectorAll('[data-property-faq-icon]').forEach((i) => i.classList.remove('rotate-180'));
+
+            if (!isOpen) {
+                panel.classList.remove('hidden');
+                trigger.classList.add('bg-gray-50');
+                icon?.classList.add('rotate-180');
+            }
+        });
+    });
+}
+
+function initPropertyInquiryModal() {
+    const modal = document.getElementById('property-inquiry-modal');
+    const backdrop = document.getElementById('property-inquiry-modal-backdrop');
+    const closeBtn = document.getElementById('property-inquiry-modal-close');
+    const triggers = document.querySelectorAll('[data-open-property-inquiry]');
+
+    if (!modal) return;
+
+    function openModal() {
+        modal.classList.add('is-open');
+        modal.classList.remove('hidden');
+        document.body.classList.add('consultation-modal-open');
+        closeBtn?.focus();
+    }
+
+    function closeModal() {
+        modal.classList.remove('is-open');
+        modal.classList.add('hidden');
+        document.body.classList.remove('consultation-modal-open');
+    }
+
+    triggers.forEach((trigger) => {
+        trigger.addEventListener('click', (event) => {
+            event.preventDefault();
+            openModal();
+        });
+    });
+
+    closeBtn?.addEventListener('click', closeModal);
+    backdrop?.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+            closeModal();
+        }
+    });
 }
 
 function initLocalityTabs() {

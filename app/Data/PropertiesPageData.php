@@ -3200,6 +3200,17 @@ class PropertiesPageData
 );
     }
 
+    public static function findBySlug(string $slug): ?array
+    {
+        foreach (self::properties() as $property) {
+            if ($property['slug'] === $slug) {
+                return $property;
+            }
+        }
+
+        return null;
+    }
+
     public static function perPage(): int
     {
         return 30;
