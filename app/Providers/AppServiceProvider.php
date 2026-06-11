@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\PropertyService;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        View::composer('partials.footer', function ($view): void {
+            $view->with('topProperties', app(PropertyService::class)->topProperties(5));
+        });
     }
 }

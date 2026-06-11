@@ -77,11 +77,31 @@ class PropertyResource extends Resource
                             ->maxLength(255),
                     ]),
                 Forms\Components\Section::make('Media')
+                    ->description('Upload images or paste URLs from WordPress / external CDN.')
                     ->schema([
+                        Forms\Components\FileUpload::make('image_upload')
+                            ->label('Upload Featured Image')
+                            ->image()
+                            ->disk('public')
+                            ->directory('properties')
+                            ->visibility('public')
+                            ->maxSize(8192)
+                            ->columnSpanFull(),
                         Forms\Components\TextInput::make('image')
                             ->label('Featured Image URL')
                             ->url()
-                            ->required()
+                            ->placeholder('https://yes2broker.in/wp-content/uploads/...')
+                            ->helperText('Used when no file is uploaded above.')
+                            ->required(fn (Forms\Get $get): bool => blank($get('image_upload')))
+                            ->columnSpanFull(),
+                        Forms\Components\FileUpload::make('gallery_uploads')
+                            ->label('Upload Gallery Images')
+                            ->image()
+                            ->multiple()
+                            ->disk('public')
+                            ->directory('properties/gallery')
+                            ->visibility('public')
+                            ->maxSize(8192)
                             ->columnSpanFull(),
                         Forms\Components\Repeater::make('gallery')
                             ->label('Gallery Image URLs')
@@ -183,7 +203,8 @@ class PropertyResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('image')
                     ->label('Image')
-                    ->square(),
+                    ->square()
+                    ->getStateUsing(fn (Property $record): string => $record->image_url),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
                     ->sortable()
@@ -204,6 +225,10 @@ class PropertyResource extends Resource
                     ->label('New')
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\IconColumn::make('is_trending')
+                    ->label('Trending')
+                    ->boolean()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()

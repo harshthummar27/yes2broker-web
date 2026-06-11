@@ -1,4 +1,11 @@
-@props(['propertyTypes' => [], 'budgets' => []])
+@props(['propertyTypes' => [], 'budgets' => [], 'selected' => []])
+
+@php
+    $selectedCity = $selected['city'] ?? request('city', 'ahmedabad');
+    $selectedArea = $selected['area'] ?? request('area', '');
+    $selectedType = $selected['type'] ?? request('type', '');
+    $selectedBudget = $selected['budget'] ?? request('budget', '');
+@endphp
 
 <form action="{{ route('properties.index') }}" method="GET" class="bg-y2b-primary rounded-xl p-6 shadow-xl flex flex-wrap items-end justify-center gap-4 md:gap-6">
     <input type="hidden" name="ptype" value="buy">
@@ -6,14 +13,14 @@
     <div class="flex flex-col items-center flex-1 min-w-[140px] max-w-[200px]">
         <label for="city" class="text-white text-sm font-medium mb-1">City</label>
         <select name="city" id="city" class="w-full bg-transparent border-b border-white text-white text-center py-2 outline-none cursor-pointer">
-            <option value="ahmedabad" class="text-gray-900">Ahmedabad</option>
-            <option value="gandhinagar" class="text-gray-900">Gandhinagar</option>
+            <option value="ahmedabad" class="text-gray-900" @selected($selectedCity === 'ahmedabad')>Ahmedabad</option>
+            <option value="gandhinagar" class="text-gray-900" @selected($selectedCity === 'gandhinagar')>Gandhinagar</option>
         </select>
     </div>
 
     <div class="flex flex-col items-center flex-1 min-w-[140px] max-w-[200px]">
         <label for="area" class="text-white text-sm font-medium mb-1">Area / Project</label>
-        <input type="text" name="area" id="area" placeholder="Enter Area / Project"
+        <input type="text" name="area" id="area" placeholder="Enter Area / Project" value="{{ $selectedArea }}"
                class="w-full bg-transparent border-b border-white text-white text-center py-2 outline-none placeholder:text-blue-200">
     </div>
 
@@ -21,7 +28,7 @@
         <label for="type" class="text-white text-sm font-medium mb-1">Type</label>
         <select name="type" id="type" class="w-full bg-transparent border-b border-white text-white text-center py-2 outline-none cursor-pointer">
             @foreach($propertyTypes as $value => $label)
-                <option value="{{ $value }}" class="text-gray-900">{{ $label }}</option>
+                <option value="{{ $value }}" class="text-gray-900" @selected($selectedType === $value)>{{ $label }}</option>
             @endforeach
         </select>
     </div>
@@ -30,7 +37,7 @@
         <label for="budget" class="text-white text-sm font-medium mb-1">Budget</label>
         <select name="budget" id="budget" class="w-full bg-transparent border-b border-white text-white text-center py-2 outline-none cursor-pointer">
             @foreach($budgets as $value => $label)
-                <option value="{{ $value }}" class="text-gray-900">{{ $label }}</option>
+                <option value="{{ $value }}" class="text-gray-900" @selected($selectedBudget === $value)>{{ $label }}</option>
             @endforeach
         </select>
     </div>

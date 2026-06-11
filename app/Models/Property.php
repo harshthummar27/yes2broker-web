@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Property extends Model
@@ -69,7 +71,64 @@ class Property extends Model
             if (empty($property->gallery) && filled($property->image)) {
                 $property->gallery = [$property->image];
             }
+
+            $property->fillDefaultDetailFields();
         });
+    }
+
+    public function fillDefaultDetailFields(): void
+    {
+        if (blank($this->description)) {
+            $this->description = sprintf(
+                '%s is a premium real estate project located at %s. Offering %s across %s, with possession expected by %s and prices starting at %s.',
+                $this->title,
+                rtrim((string) $this->location, '.'),
+                $this->bhk,
+                $this->area,
+                $this->possession,
+                $this->price
+            );
+        }
+
+        if (empty($this->overview)) {
+            $this->overview = [
+                'project_area' => $this->area,
+                'configurations' => $this->bhk,
+                'project_size' => 'Contact for details',
+                'launch_date' => 'Contact for details',
+                'price_range' => $this->price,
+                'possession' => $this->possession,
+                'rera_id' => 'Available on request',
+            ];
+        }
+
+        if (empty($this->amenities)) {
+            $this->amenities = [
+                'Gymnasium',
+                'Children\'s Play Area',
+                '24×7 Security',
+                'Power Backup',
+                'Landscaped Gardens',
+                'Parking',
+            ];
+        }
+
+        if (empty($this->faqs)) {
+            $this->faqs = [
+                [
+                    'question' => 'Where is '.$this->title.' located?',
+                    'answer' => $this->location,
+                ],
+                [
+                    'question' => 'What is the price range?',
+                    'answer' => $this->price,
+                ],
+                [
+                    'question' => 'When is possession expected?',
+                    'answer' => $this->possession,
+                ],
+            ];
+        }
     }
 
     public function scopeActive(Builder $query): Builder
@@ -137,6 +196,47 @@ class Property extends Model
         return $query;
     }
 
+    protected function imageUrl(): Attribute
+    {
+        return Attribute::get(fn () => self::resolveMediaUrl($this->image));
+    }
+
+    public function postcode(): string
+    {
+        if (preg_match('/\b(\d{6})\b/', $this->location, $matches)) {
+            return $matches[1];
+        }
+
+        return '';
+    }
+
+    public static function resolveMediaUrl(?string $path): string
+    {
+        if (blank($path)) {
+            return config('site.media_url').'/2025/09/img63-scaled.jpg';
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '//')) {
+            return $path;
+        }
+
+        return Storage::disk('public')->url(ltrim($path, '/'));
+    }
+
+    public function galleryUrls(): array
+    {
+        $gallery = $this->gallery ?? [];
+
+        if ($gallery === []) {
+            return [$this->image_url];
+        }
+
+        return array_values(array_map(
+            fn ($item) => is_string($item) ? self::resolveMediaUrl($item) : self::resolveMediaUrl($item['url'] ?? null),
+            $gallery
+        ));
+    }
+
     public function toCardArray(): array
     {
         return [
@@ -147,7 +247,8 @@ class Property extends Model
             'area' => $this->area,
             'possession' => $this->possession,
             'price' => $this->price,
-            'image' => $this->image,
+            'image' => $this->image_url,
+            'is_new' => $this->is_new,
         ];
     }
 
@@ -163,8 +264,8 @@ class Property extends Model
             'area' => $this->area,
             'possession' => $this->possession,
             'price' => $this->price,
-            'image' => $this->image,
-            'gallery' => $this->gallery ?: [$this->image],
+            'image' => $this->image_url,
+            'gallery' => $this->galleryUrls(),
             'description' => $this->description ?? '',
             'overview' => [
                 'project_area' => $overview['project_area'] ?? $this->area,

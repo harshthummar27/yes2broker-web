@@ -54,9 +54,16 @@
             </button>
 
             <div id="property-carousel" class="property-carousel flex gap-5 overflow-x-auto scroll-smooth px-8 pb-4">
-                @foreach($trendingProperties as $property)
+                @forelse($trendingProperties as $property)
                     <x-property-card :property="$property" />
-                @endforeach
+                @empty
+                    <div class="w-full text-center py-12 text-gray-500">
+                        <p>No properties available yet.</p>
+                        <a href="{{ route('properties.index') }}" class="text-y2b-primary font-semibold hover:text-y2b-accent mt-2 inline-block">
+                            Browse properties
+                        </a>
+                    </div>
+                @endforelse
             </div>
 
             <button id="carousel-next" type="button" aria-label="Next"
@@ -158,6 +165,7 @@
 </section>
 
 {{-- Localities --}}
+@if(count($localities) > 0)
 <section class="py-14">
     <div class="max-w-7xl mx-auto px-4">
         <div class="text-center mb-8">
@@ -177,17 +185,18 @@
         @foreach($localities as $name => $properties)
             <div data-locality-panel="{{ $name }}"
                  class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 {{ $loop->first ? '' : 'hidden' }}">
-                @foreach($properties as $propertyName)
-                    <a href="{{ route('properties.index', ['area' => strtolower(str_replace(' ', '-', $propertyName))]) }}"
+                @foreach($properties as $propertyItem)
+                    <a href="{{ route('properties.show', $propertyItem['slug']) }}"
                        class="flex items-center gap-2 text-sm text-gray-700 hover:text-y2b-primary border border-gray-200 rounded-lg px-4 py-3 hover:border-y2b-primary transition">
                         <svg class="w-4 h-4 text-y2b-accent shrink-0" fill="currentColor" viewBox="0 0 384 512"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"/></svg>
-                        {{ $propertyName }}
+                        {{ $propertyItem['title'] }}
                     </a>
                 @endforeach
             </div>
         @endforeach
     </div>
 </section>
+@endif
 
 {{-- Consultation + Featured carousel --}}
 <section id="consultation" class="consultation-section py-16">
@@ -247,14 +256,37 @@
             @foreach($featuredCarousel as $index => $featured)
                 <div data-featured-slide="{{ $index }}"
                      class="bg-white rounded-xl overflow-hidden shadow-2xl {{ $index > 0 ? 'hidden' : '' }}">
-                    <img src="{{ $featured['image'] }}" alt="{{ $featured['title'] }}"
-                         class="w-full h-56 object-cover">
+                    @if(! empty($featured['slug']))
+                        <a href="{{ route('properties.show', $featured['slug']) }}" class="block group">
+                            <img src="{{ $featured['image'] }}" alt="{{ $featured['title'] }}"
+                                 class="w-full h-56 object-cover group-hover:opacity-95 transition">
+                        </a>
+                    @else
+                        <img src="{{ $featured['image'] }}" alt="{{ $featured['title'] }}"
+                             class="w-full h-56 object-cover">
+                    @endif
                     <div class="p-6">
-                        <h3 class="text-xl font-bold text-y2b-primary mb-3">{{ $featured['title'] }}</h3>
+                        <h3 class="text-xl font-bold text-y2b-primary mb-3">
+                            @if(! empty($featured['slug']))
+                                <a href="{{ route('properties.show', $featured['slug']) }}" class="hover:text-y2b-accent transition">
+                                    {{ $featured['title'] }}
+                                </a>
+                            @else
+                                {{ $featured['title'] }}
+                            @endif
+                        </h3>
                         <p class="text-sm text-gray-500 mb-1">Address</p>
                         <p class="text-sm font-semibold text-gray-800 mb-3">{{ $featured['address'] }}</p>
-                        <p class="text-sm text-gray-500 mb-1">Post Code</p>
-                        <p class="text-sm font-semibold text-gray-800">{{ $featured['postcode'] }}</p>
+                        @if(! empty($featured['postcode']))
+                            <p class="text-sm text-gray-500 mb-1">Post Code</p>
+                            <p class="text-sm font-semibold text-gray-800 mb-3">{{ $featured['postcode'] }}</p>
+                        @endif
+                        @if(! empty($featured['slug']))
+                            <a href="{{ route('properties.show', $featured['slug']) }}"
+                               class="inline-block text-sm font-semibold text-y2b-primary border border-y2b-primary px-4 py-2 rounded hover:bg-y2b-primary hover:text-white transition">
+                                View Details
+                            </a>
+                        @endif
                     </div>
                 </div>
             @endforeach

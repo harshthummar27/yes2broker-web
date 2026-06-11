@@ -9,8 +9,28 @@ use Illuminate\Database\Seeder;
 
 class PropertySeeder extends Seeder
 {
+    /** Slugs shown in homepage "Trending Properties" carousel */
+    private const TRENDING_SLUGS = [
+        'anand-paramount',
+        'vivaan-essence',
+        'adarsh-aster',
+        'avirat-giriraj',
+        'amrut-orchid',
+        'binori-aristella',
+        'dev-amrakunj-platinum',
+        'elenza-arista',
+        'ganesh-legacy',
+        'hr-eliseo-ii',
+        'shaligram-prestige',
+        'riviera-majestica',
+    ];
+
     public function run(): void
     {
+        Property::query()->update(['is_trending' => false]);
+
+        $imported = 0;
+
         foreach (PropertiesPageData::properties() as $listing) {
             $detail = PropertyDetailData::findBySlug($listing['slug']);
 
@@ -37,9 +57,16 @@ class PropertySeeder extends Seeder
                     'map_embed_url' => $detail['map_embed_url'],
                     'city' => str_contains(strtolower($detail['location']), 'gandhinagar') ? 'Gandhinagar' : 'Ahmedabad',
                     'is_new' => $detail['is_new'] ?? true,
+                    'is_trending' => in_array($detail['slug'], self::TRENDING_SLUGS, true),
                     'is_active' => true,
                 ]
             );
+
+            $imported++;
+        }
+
+        if ($this->command) {
+            $this->command->info("Properties imported/updated: {$imported}");
         }
     }
 }

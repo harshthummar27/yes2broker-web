@@ -63,12 +63,48 @@ URL: `http://127.0.0.1:8000/admin` or `http://localhost/yes2broker/public/admin`
 | Email | `admin@yes2broker.in` |
 | Password | `password` |
 
-Change the password after first login. The admin panel lets you add, edit, and delete properties. The public site reads from the database automatically.
+Change the password after first login.
 
-Seed properties again:
+### Properties module (dynamic)
+
+| Action | Where |
+|--------|--------|
+| Add property | Admin → Properties → Create |
+| Edit property | Admin → Properties → Edit |
+| Delete property | Admin → Properties → Delete |
+| View on site | Edit page → **View on site** button |
+
+Changes in admin appear immediately on:
+
+- Homepage (trending carousel, localities, footer top properties)
+- `/all-properties` listing + filters + load more
+- `/property/{slug}` detail page
+
+**Trending on Homepage** — enable the toggle when editing a property.
+
+### Database storage
+
+Properties are stored in MySQL table `properties` (not in PHP files).
+
+Check count:
 
 ```powershell
-C:\xampp\php\php.exe artisan db:seed --class=PropertySeeder
+C:\xampp\mysql\bin\mysql.exe -u root yes2broker -e "SELECT COUNT(*) FROM properties;"
+```
+
+Import / re-sync all properties into DB:
+
+```powershell
+C:\xampp\php\php.exe artisan properties:import
+C:\xampp\php\php.exe artisan properties:import --fresh
+```
+
+First-time setup:
+
+```powershell
+C:\xampp\php\php.exe artisan migrate
+C:\xampp\php\php.exe artisan db:seed
+C:\xampp\php\php.exe artisan storage:link
 ```
 
 ## Documentation

@@ -1,8 +1,3 @@
-@php
-    use App\Data\HomePageData;
-    $topProperties = HomePageData::topProperties();
-@endphp
-
 <footer class="bg-y2b-footer text-gray-300">
     <div class="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 lg:grid-cols-4 gap-10">
         <div>
