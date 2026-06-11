@@ -166,30 +166,38 @@
 
 {{-- Localities --}}
 @if(count($localities) > 0)
-<section class="py-14">
+<section class="py-10 md:py-14 overflow-hidden">
     <div class="max-w-7xl mx-auto px-4">
-        <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold text-y2b-primary">Our Localities</h2>
-            <h2 class="text-xl text-gray-500 mt-2">Explore Properties By Localities</h2>
+        <div class="text-center mb-6 md:mb-8">
+            <h2 class="text-2xl md:text-3xl font-bold text-y2b-primary">Our Localities</h2>
+            <p class="text-base md:text-xl text-gray-500 mt-2">Explore Properties By Localities</p>
         </div>
 
-        <div class="flex justify-center gap-3 mb-8">
-            @foreach(array_keys($localities) as $index => $name)
-                <button type="button" data-locality-tab="{{ $name }}"
-                        class="px-6 py-2 rounded-full font-medium text-sm transition {{ $index === 0 ? 'bg-y2b-primary text-white' : 'bg-y2b-light text-y2b-primary' }}">
-                    {{ $name }}
-                </button>
-            @endforeach
+        <div class="locality-tabs-wrap relative mb-6 md:mb-8 -mx-4 px-4 md:mx-0 md:px-0">
+            <div class="locality-tabs-fade locality-tabs-fade-left md:hidden" aria-hidden="true"></div>
+            <div class="locality-tabs-fade locality-tabs-fade-right md:hidden" aria-hidden="true"></div>
+            <div id="locality-tabs"
+                 role="tablist"
+                 aria-label="Property localities"
+                 class="locality-tabs flex items-center gap-2 md:gap-3 overflow-x-auto pb-2 md:pb-0 md:flex-wrap md:justify-center md:overflow-visible scroll-smooth snap-x snap-mandatory md:snap-none">
+                @foreach(array_keys($localities) as $index => $name)
+                    <button type="button"
+                            data-locality-tab="{{ $name }}"
+                            class="locality-tab shrink-0 snap-start whitespace-nowrap px-4 py-2 md:px-6 rounded-full font-medium text-xs sm:text-sm transition {{ $index === 0 ? 'bg-y2b-primary text-white shadow-sm' : 'bg-y2b-light text-y2b-primary' }}">
+                        {{ $name }}
+                    </button>
+                @endforeach
+            </div>
         </div>
 
         @foreach($localities as $name => $properties)
             <div data-locality-panel="{{ $name }}"
-                 class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 {{ $loop->first ? '' : 'hidden' }}">
+                 class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 {{ $loop->first ? '' : 'hidden' }}">
                 @foreach($properties as $propertyItem)
                     <a href="{{ route('properties.show', $propertyItem['slug']) }}"
-                       class="flex items-center gap-2 text-sm text-gray-700 hover:text-y2b-primary border border-gray-200 rounded-lg px-4 py-3 hover:border-y2b-primary transition">
-                        <svg class="w-4 h-4 text-y2b-accent shrink-0" fill="currentColor" viewBox="0 0 384 512"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"/></svg>
-                        {{ $propertyItem['title'] }}
+                       class="locality-property-link flex items-start gap-2.5 text-sm text-gray-700 hover:text-y2b-primary bg-white border border-gray-200 rounded-lg px-3 py-3 sm:px-4 sm:py-3 hover:border-y2b-primary hover:shadow-sm transition min-w-0">
+                        <svg class="w-4 h-4 text-y2b-accent shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 384 512"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"/></svg>
+                        <span class="line-clamp-2 leading-snug break-words">{{ $propertyItem['title'] }}</span>
                     </a>
                 @endforeach
             </div>

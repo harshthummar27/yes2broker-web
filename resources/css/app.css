@@ -149,3 +149,45 @@ body.consultation-modal-open {
 #property-inquiry-modal.is-open {
     display: flex;
 }
+
+/* Homepage locality tabs — mobile horizontal scroll */
+.locality-tabs {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.locality-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.locality-tabs-wrap {
+    position: relative;
+}
+
+.locality-tabs-fade {
+    position: absolute;
+    top: 0;
+    bottom: 8px;
+    width: 1.75rem;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.locality-tabs-fade-left {
+    left: 0;
+    background: linear-gradient(to right, #fff 15%, transparent);
+}
+
+.locality-tabs-fade-right {
+    right: 0;
+    background: linear-gradient(to left, #fff 15%, transparent);
+}
+
+.locality-tab {
+    min-height: 2.5rem;
+}
+
+.locality-property-link {
+    word-break: break-word;
+}

@@ -369,23 +369,42 @@ function initPropertyInquiryModal() {
 }
 
 function initLocalityTabs() {
+    const tabsContainer = document.getElementById('locality-tabs');
     const tabs = document.querySelectorAll('[data-locality-tab]');
     const panels = document.querySelectorAll('[data-locality-panel]');
 
-    tabs.forEach((tab) => {
-        tab.addEventListener('click', () => {
-            const target = tab.dataset.localityTab;
+    if (tabs.length === 0) return;
 
-            tabs.forEach((t) => {
-                t.classList.toggle('bg-y2b-primary', t.dataset.localityTab === target);
-                t.classList.toggle('text-white', t.dataset.localityTab === target);
-                t.classList.toggle('bg-y2b-light', t.dataset.localityTab !== target);
-                t.classList.toggle('text-y2b-primary', t.dataset.localityTab !== target);
-            });
+    function setActiveTab(activeTab) {
+        const target = activeTab.dataset.localityTab;
 
-            panels.forEach((panel) => {
-                panel.classList.toggle('hidden', panel.dataset.localityPanel !== target);
-            });
+        tabs.forEach((tab) => {
+            const isActive = tab === activeTab;
+            tab.classList.toggle('bg-y2b-primary', isActive);
+            tab.classList.toggle('text-white', isActive);
+            tab.classList.toggle('shadow-sm', isActive);
+            tab.classList.toggle('bg-y2b-light', !isActive);
+            tab.classList.toggle('text-y2b-primary', !isActive);
+            tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
         });
+
+        panels.forEach((panel) => {
+            panel.classList.toggle('hidden', panel.dataset.localityPanel !== target);
+        });
+
+        if (tabsContainer) {
+            const containerRect = tabsContainer.getBoundingClientRect();
+            const tabRect = activeTab.getBoundingClientRect();
+            const offset = tabRect.left - containerRect.left - (containerRect.width / 2) + (tabRect.width / 2);
+
+            tabsContainer.scrollBy({ left: offset, behavior: 'smooth' });
+        }
+    }
+
+    tabs.forEach((tab, index) => {
+        tab.setAttribute('role', 'tab');
+        tab.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+
+        tab.addEventListener('click', () => setActiveTab(tab));
     });
 }
