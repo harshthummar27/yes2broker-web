@@ -12,20 +12,55 @@
         <div class="grid lg:grid-cols-5 gap-8 lg:gap-10 items-start">
             {{-- Gallery --}}
             <div class="lg:col-span-3" id="property-gallery">
-                <div class="property-gallery-main rounded-2xl overflow-hidden bg-gray-100 shadow-md mb-4">
-                    <img id="property-gallery-main"
-                         src="{{ $property['gallery'][0] }}"
-                         alt="{{ $property['title'] }}"
-                         class="w-full h-72 md:h-[420px] object-cover">
+                {{-- Mobile: swipe slider --}}
+                <div class="md:hidden">
+                    <div class="property-mobile-slider rounded-2xl overflow-hidden bg-gray-100 shadow-md aspect-[16/9]">
+                        <div class="property-mobile-track flex flex-nowrap overflow-x-auto snap-x snap-mandatory w-full h-full"
+                             data-property-mobile-track>
+                            @foreach($property['gallery'] as $index => $image)
+                                <div class="snap-start shrink-0 w-full h-full">
+                                    <img
+                                        src="{{ $image }}"
+                                        alt="{{ $property['title'] }} image {{ $index + 1 }}"
+                                        class="w-full h-full object-cover object-center"
+                                        loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
+                                    >
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    @if(count($property['gallery']) > 1)
+                        <div class="flex items-center justify-center gap-2 mt-3" data-property-mobile-dots>
+                            @foreach($property['gallery'] as $index => $image)
+                                <button
+                                    type="button"
+                                    class="w-2.5 h-2.5 rounded-full {{ $index === 0 ? 'bg-y2b-primary' : 'bg-gray-300' }}"
+                                    aria-label="Go to image {{ $index + 1 }}"
+                                    data-property-mobile-dot="{{ $index }}"
+                                ></button>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+
+                {{-- Desktop: main image + thumbs --}}
+                <div class="hidden md:block">
+                    <div class="property-gallery-main rounded-2xl overflow-hidden bg-gray-100 shadow-md mb-4">
+                        <img id="property-gallery-main"
+                             src="{{ $property['gallery'][0] }}"
+                             alt="{{ $property['title'] }}"
+                             class="w-full h-[420px] object-cover object-center">
+                    </div>
                 </div>
 
                 @if(count($property['gallery']) > 1)
-                    <div class="property-gallery-thumbs flex gap-3 overflow-x-auto pb-1">
+                    <div class="hidden md:flex property-gallery-thumbs flex-nowrap gap-3 overflow-x-auto pb-2 pr-2 -mr-2 snap-x snap-mandatory">
                         @foreach($property['gallery'] as $index => $image)
                             <button type="button"
                                     data-property-gallery-thumb="{{ $index }}"
                                     data-image="{{ $image }}"
-                                    class="property-gallery-thumb shrink-0 w-20 h-20 md:w-24 md:h-24 rounded-lg overflow-hidden border-2 transition {{ $index === 0 ? 'border-y2b-primary' : 'border-transparent opacity-70 hover:opacity-100' }}"
+                                    class="property-gallery-thumb snap-start shrink-0 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-lg overflow-hidden border-2 transition {{ $index === 0 ? 'border-y2b-primary' : 'border-transparent opacity-70 hover:opacity-100' }}"
                                     aria-label="View image {{ $index + 1 }}">
                                 <img src="{{ $image }}" alt="" class="w-full h-full object-cover">
                             </button>
@@ -37,14 +72,16 @@
             {{-- Summary Card --}}
             <aside class="lg:col-span-2">
                 <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden lg:sticky lg:top-24">
+                    {{-- On mobile, the gallery image is already shown above.
+                         Keeping this image only for desktop prevents the “double big image” layout. --}}
                     <img src="{{ $property['image'] }}" alt="{{ $property['title'] }}"
-                         class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h2 class="text-2xl font-bold text-y2b-primary mb-3">{{ $property['title'] }}</h2>
+                         class="hidden lg:block w-full h-48 object-cover object-center">
+                    <div class="p-5 sm:p-6">
+                        <h2 class="text-xl sm:text-2xl font-bold text-y2b-primary mb-3 leading-snug break-words">{{ $property['title'] }}</h2>
 
                         <p class="text-gray-500 text-sm flex items-start gap-2 mb-5">
                             <svg class="w-4 h-4 shrink-0 mt-0.5 text-y2b-accent" fill="currentColor" viewBox="0 0 384 512"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"/></svg>
-                            {{ $property['location'] }}
+                            <span class="break-words">{{ $property['location'] }}</span>
                         </p>
 
                         <div class="mb-5">
@@ -62,7 +99,7 @@
                             </ul>
                         </div>
 
-                        <p class="text-xl font-bold text-y2b-primary mb-5">{{ $property['price'] }}</p>
+                        <p class="text-lg sm:text-xl font-bold text-y2b-primary mb-5 break-words">{{ $property['price'] }}</p>
 
                         <button type="button"
                                 @if(filled($property['brochure_url'] ?? null))
@@ -86,7 +123,7 @@
 <section class="py-10 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-2xl font-bold text-y2b-primary mb-4">Descriptions</h2>
-        <p class="text-gray-600 leading-relaxed max-w-4xl">{{ $property['description'] }}</p>
+        <p class="text-gray-600 leading-relaxed max-w-4xl break-words">{{ $property['description'] }}</p>
     </div>
 </section>
 
@@ -146,11 +183,11 @@
 <section class="py-10 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-2xl font-bold text-y2b-primary mb-8">Additional Amenities</h2>
-        <div class="grid md:grid-cols-2 gap-x-12 gap-y-4">
+        <div class="grid sm:grid-cols-2 gap-x-12 gap-y-4">
             @foreach($property['amenities'] as $amenity)
                 <div class="flex items-start gap-3 text-gray-700 text-sm">
                     <span class="w-2 h-2 rounded-full bg-y2b-accent shrink-0 mt-2"></span>
-                    {{ $amenity }}
+                    <span class="break-words">{{ $amenity }}</span>
                 </div>
             @endforeach
         </div>
@@ -187,8 +224,8 @@
                 <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                     <button type="button"
                             data-property-faq-trigger="{{ $index }}"
-                            class="w-full flex items-center justify-between px-5 py-4 text-left font-semibold text-y2b-primary hover:bg-gray-50 transition {{ $index === 0 ? 'bg-gray-50' : '' }}">
-                        <span>{{ $faq['question'] }}</span>
+                            class="w-full flex items-start justify-between gap-4 px-5 py-4 text-left font-semibold text-y2b-primary hover:bg-gray-50 transition {{ $index === 0 ? 'bg-gray-50' : '' }}">
+                        <span class="flex-1 break-words">{{ $faq['question'] }}</span>
                         <svg class="w-5 h-5 shrink-0 text-y2b-accent transition-transform {{ $index === 0 ? 'rotate-180' : '' }}"
                              data-property-faq-icon="{{ $index }}" fill="currentColor" viewBox="0 0 448 512">
                             <path d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z"/>
@@ -196,7 +233,7 @@
                     </button>
                     <div data-property-faq-panel="{{ $index }}"
                          class="px-5 pb-4 text-gray-600 text-sm leading-relaxed {{ $index === 0 ? '' : 'hidden' }}">
-                        {{ $faq['answer'] }}
+                        <span class="break-words">{{ $faq['answer'] }}</span>
                     </div>
                 </div>
             @endforeach
@@ -213,21 +250,21 @@
                 <p class="text-blue-100 leading-relaxed mb-6">
                     Buying a property is a big decision — and we're here to make it easier for you. Whether you're planning to invest, buy your dream home, or explore financing options, our expert advisors are just a message away. Share your details using the form and we'll connect you with personalized guidance, transparent pricing, and complete project information.
                 </p>
-                <div class="flex flex-wrap gap-4">
+                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
                     <a href="{{ config('site.phone_href') }}"
-                       class="inline-flex items-center gap-2 bg-y2b-accent hover:bg-yellow-500 text-y2b-primary font-bold px-6 py-3 rounded-lg transition text-sm">
+                       class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-y2b-accent hover:bg-yellow-500 text-y2b-primary font-bold px-6 py-3 rounded-lg transition text-sm">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 512 512"><path d="M497.39 361.8l-112-48a24 24 0 0 0-28 6.9l-49.6 60.6A370.66 370.66 0 0 1 130.6 204.11l60.6-49.6a23.94 23.94 0 0 0 6.9-28l-48-112A24.16 24.16 0 0 0 122.6.61l-104 24A24 24 0 0 0 0 48c0 256.5 207.9 464 464 464a24 24 0 0 0 23.4-18.6l24-104a24.29 24.29 0 0 0-14.01-27.6z"/></svg>
                         Get in Touch
                     </a>
                     <button type="button"
                             data-open-property-inquiry
-                            class="inline-flex items-center gap-2 border border-white/40 hover:bg-white/10 text-white font-semibold px-6 py-3 rounded-lg transition text-sm">
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/40 hover:bg-white/10 text-white font-semibold px-6 py-3 rounded-lg transition text-sm">
                         Virtual Tour
                     </button>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 text-gray-800" id="property-inquiry-form">
+            <div class="bg-white rounded-2xl shadow-2xl p-5 sm:p-6 md:p-8 text-gray-800" id="property-inquiry-form">
                 <h3 class="text-xl font-bold text-y2b-primary mb-1">Get in Touch</h3>
                 <p class="text-gray-500 text-sm mb-6">Share your details for {{ $property['title'] }}</p>
 

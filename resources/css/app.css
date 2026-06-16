@@ -136,6 +136,7 @@ body.consultation-modal-open {
 .property-gallery-thumbs {
     -ms-overflow-style: none;
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
 }
 
 .property-gallery-thumbs::-webkit-scrollbar {
@@ -144,6 +145,16 @@ body.consultation-modal-open {
 
 .property-gallery-thumb {
     transition: border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.property-mobile-track {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.property-mobile-track::-webkit-scrollbar {
+    display: none;
 }
 
 #property-inquiry-modal.is-open {
