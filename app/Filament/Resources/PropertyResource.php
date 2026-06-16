@@ -180,6 +180,15 @@ class PropertyResource extends Resource
                             ->label('Google Maps Embed URL')
                             ->url()
                             ->columnSpanFull(),
+                        Forms\Components\TextInput::make('street_view_embed_url')
+                            ->label('360° / Street View Embed URL')
+                            ->url()
+                            ->helperText('Paste the Google Street View iframe URL from the old site.')
+                            ->columnSpanFull(),
+                        Forms\Components\TextInput::make('brochure_url')
+                            ->label('Brochure PDF URL')
+                            ->url()
+                            ->columnSpanFull(),
                     ]),
                 Forms\Components\Section::make('Settings')
                     ->columns(3)

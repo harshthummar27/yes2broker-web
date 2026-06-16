@@ -71,6 +71,8 @@ class PropertyDetailData
             'amenities' => self::defaultAmenities($listing),
             'faqs' => self::defaultFaqs($listing),
             'map_embed_url' => self::mapEmbedUrl($listing['location']),
+            'street_view_embed_url' => null,
+            'brochure_url' => null,
             'is_new' => true,
         ], $overrides);
 
@@ -209,6 +211,55 @@ class PropertyDetailData
                     ],
                 ],
                 'map_embed_url' => 'https://maps.google.com/maps?q=Anand%20ParamountBefore%20Uma%20Party%20Plot%2C%20Anand%20Paramount%2C%20opp.%20S-Mall%2C%20Motera%2C%20Ahmedabad%2C%20Gujarat%20380005&t=m&z=10&output=embed&iwloc=near',
+            ],
+            'elenza-gradient' => [
+                'location' => 'Elenza Street, Opp. Elenza Greenwood, VIP Road, Shela, South West, Ahmedabad.',
+                'bhk' => 'Shop, 3 & 4 BHK Apartments',
+                'area' => '3.84 Acres',
+                'possession' => 'December 2029',
+                'price' => '₹82 Lakhs – ₹1.70 Cr',
+                'gallery' => [
+                    'https://yes2broker.in/wp-content/uploads/2025/10/elenza_gradient-shela-ahmedabad-elenza_green_projets_llp.avif',
+                    'https://yes2broker.in/wp-content/uploads/2025/10/1920_950.jpg',
+                    'https://yes2broker.in/wp-content/uploads/2025/10/fs-19.avif',
+                    'https://yes2broker.in/wp-content/uploads/2025/10/737_6881.jpg',
+                    'https://yes2broker.in/wp-content/uploads/2025/10/fs-2-11.avif',
+                    'https://yes2broker.in/wp-content/uploads/2025/10/fs-4-9.avif',
+                ],
+                'description' => 'Elenza Gradient is a mixed-use project located on VIP Road, Bopal, offering both retail and residential spaces. The project includes a shop of 305 sq.ft., a 3 BHK residential unit (1725 sq.ft. priced at ₹82 L) and a 4 BHK (3500 sq.ft. priced at ₹1.70 Cr. Designed to cater to both investment and family needs, it aims to provide modern amenities and good connectivity in Bopal\'s growing neighborhood.',
+                'overview' => [
+                    'project_area' => '3.84 Acres',
+                    'configurations' => "Shop – 305 Sq.Ft\n3 BHK – 1725 Sq.Ft\n4 BHK – 3500 Sq.Ft",
+                    'project_size' => '12 Buildings - 624 units',
+                    'launch_date' => 'Aug, 2023',
+                    'price_range' => '₹82 Lakhs – ₹1.70 Cr',
+                    'possession' => 'Dec, 2029',
+                    'rera_id' => 'PR/GJ/AHMEDABAD/ AHMEDABAD CITY/AUDA/MAA12147/170823',
+                ],
+                'amenities' => [
+                    'Common lobby & corridors',
+                    'Power backup & 24×7 water supply',
+                ],
+                'faqs' => [
+                    [
+                        'question' => 'Where is it located?',
+                        'answer' => 'Elenza Street, Opp. Elenza Greenwood, VIP Road, Shela, South West, Ahmedabad.',
+                    ],
+                    [
+                        'question' => 'What are the available configurations?',
+                        'answer' => 'Shop (305 sq.ft.), 3 BHK (1725 sq.ft.), 4 BHK (3500 sq.ft.)',
+                    ],
+                    [
+                        'question' => 'What\'s the price range?',
+                        'answer' => '₹82 L – ₹1.70 Cr',
+                    ],
+                    [
+                        'question' => 'How many units & towers?',
+                        'answer' => '12 Buildings – 624 units',
+                    ],
+                ],
+                'map_embed_url' => 'https://maps.google.com/maps?q=ELENZA%C2%AE%20-%20GRADIENT%20Elenza%20Street%2C%20VIP%20Rd%2C%20Shela%2C%20Gujarat%20380057&t=m&z=10&output=embed&iwloc=near',
+                'street_view_embed_url' => 'https://www.google.com/maps/embed?pb=!4v1759653551854!6m8!1m7!1s0kEbh_DaQg3bvzxBw8Uppg!2m2!1d23.01536914923802!2d72.4510727326136!3f283.20966!4f0!5f0.7820865974627469',
             ],
         ];
     }

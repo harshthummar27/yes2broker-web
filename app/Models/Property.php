@@ -26,6 +26,8 @@ class Property extends Model
         'amenities',
         'faqs',
         'map_embed_url',
+        'street_view_embed_url',
+        'brochure_url',
         'city',
         'property_type',
         'is_new',
@@ -102,7 +104,7 @@ class Property extends Model
             ];
         }
 
-        if (empty($this->amenities)) {
+        if (empty($this->amenities) && ! $this->exists) {
             $this->amenities = [
                 'Gymnasium',
                 'Children\'s Play Area',
@@ -113,7 +115,7 @@ class Property extends Model
             ];
         }
 
-        if (empty($this->faqs)) {
+        if (empty($this->faqs) && ! $this->exists) {
             $this->faqs = [
                 [
                     'question' => 'Where is '.$this->title.' located?',
@@ -279,6 +281,8 @@ class Property extends Model
             'amenities' => $this->amenities ?? [],
             'faqs' => $this->faqs ?? [],
             'map_embed_url' => $this->map_embed_url,
+            'street_view_embed_url' => $this->street_view_embed_url,
+            'brochure_url' => $this->brochure_url,
             'is_new' => $this->is_new,
         ];
     }

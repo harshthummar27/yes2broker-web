@@ -17,7 +17,14 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AdminUserSeeder::class,
-            PropertySeeder::class,
         ]);
+
+        if (is_file(base_path('properties_new.sql'))
+            && is_file(base_path('wp_posts.csv'))
+            && is_file(base_path('Properties-Export-2026-June-16-1029.csv'))) {
+            $this->call(LegacyPropertySeeder::class);
+        } else {
+            $this->call(PropertySeeder::class);
+        }
     }
 }

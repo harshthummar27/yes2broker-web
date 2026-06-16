@@ -65,7 +65,11 @@
                         <p class="text-xl font-bold text-y2b-primary mb-5">{{ $property['price'] }}</p>
 
                         <button type="button"
-                                data-open-property-inquiry
+                                @if(filled($property['brochure_url'] ?? null))
+                                    onclick="window.open('{{ $property['brochure_url'] }}', '_blank')"
+                                @else
+                                    data-open-property-inquiry
+                                @endif
                                 class="w-full bg-y2b-primary hover:bg-y2b-primary-dark text-white font-semibold px-6 py-3 rounded-lg transition text-sm mb-3">
                             Download Brochure
                         </button>
@@ -105,7 +109,7 @@
                     </div>
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">{{ $item['label'] }}</p>
-                        <p class="text-sm font-semibold text-y2b-primary">{{ $item['value'] }}</p>
+                        <p class="text-sm font-semibold text-y2b-primary">{!! nl2br(e($item['value'])) !!}</p>
                     </div>
                 </div>
             @endforeach
@@ -118,7 +122,27 @@
     </div>
 </section>
 
+@if(filled($property['street_view_embed_url'] ?? null))
+{{-- 360 / Street View --}}
+<section class="py-10 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-2xl font-bold text-y2b-primary mb-6">360 Degree View</h2>
+        <div class="rounded-2xl overflow-hidden shadow-md border border-gray-100">
+            <iframe
+                loading="lazy"
+                src="{{ $property['street_view_embed_url'] }}"
+                title="{{ $property['title'] }} street view"
+                class="w-full h-72 md:h-[480px] border-0"
+                allowfullscreen
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+    </div>
+</section>
+@endif
+
 {{-- Amenities --}}
+@if(count($property['amenities'] ?? []) > 0)
 <section class="py-10 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-2xl font-bold text-y2b-primary mb-8">Additional Amenities</h2>
@@ -132,8 +156,10 @@
         </div>
     </div>
 </section>
+@endif
 
 {{-- Map --}}
+@if(filled($property['map_embed_url'] ?? null))
 <section class="py-10 bg-white">
     <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-2xl font-bold text-y2b-primary mb-6">Project Location</h2>
@@ -150,6 +176,7 @@
         </div>
     </div>
 </section>
+@endif
 
 {{-- FAQ --}}
 <section class="py-10 bg-gray-50">
