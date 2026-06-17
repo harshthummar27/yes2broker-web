@@ -97,10 +97,12 @@
                          class="h-12 object-contain mb-4">
                     <h3 class="font-bold text-y2b-primary text-sm mb-2">{{ $bank['name'] }}</h3>
                     <p class="text-sm font-semibold text-gray-800 mb-4">{{ $bank['rate'] }}</p>
-                    <a href="{{ route('contact') }}"
-                       class="inline-block text-sm font-semibold text-y2b-primary border border-y2b-primary px-5 py-1.5 rounded hover:bg-y2b-primary hover:text-white transition">
+                    <button type="button"
+                            data-open-home-loan-bank
+                            data-bank-name="{{ $bank['name'] }}"
+                            class="inline-block text-sm font-semibold text-y2b-primary border border-y2b-primary px-5 py-1.5 rounded hover:bg-y2b-primary hover:text-white transition">
                         Know more
-                    </a>
+                    </button>
                 </div>
             @endforeach
         </div>
@@ -114,4 +116,6 @@
         <x-emi-calculator />
     </div>
 </section>
+
+<x-home-loan-bank-modal />
 @endsection

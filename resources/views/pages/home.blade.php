@@ -4,13 +4,14 @@
 
 @section('content')
 {{-- Hero with video + search --}}
-<section class="relative min-h-[480px] md:min-h-[560px] flex items-center">
+<section class="relative min-h-[480px] md:min-h-[560px] flex items-center overflow-hidden">
     <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover">
         <source src="{{ config('site.hero_video') }}" type="video/mp4">
     </video>
-    <div class="hero-overlay absolute inset-0"></div>
     <div class="relative z-10 w-full max-w-6xl mx-auto px-4 py-16">
-        <x-property-search :property-types="$propertyTypes" :budgets="$budgets" />
+        <x-property-search
+            :property-types="$propertyTypes"
+            :budgets="$budgets" />
     </div>
 </section>
 
@@ -41,7 +42,7 @@
 
 {{-- Trending Properties --}}
 <section class="py-14">
-    <div class="max-w-7xl mx-auto px-4">
+    <div class="max-w-7xl mx-auto px-2">
         <div class="text-center mb-10">
             <h2 class="text-3xl font-bold text-y2b-primary">Our Listing</h2>
             <h4 class="text-gray-500 mt-2">Trending Properties at Ahmedabad</h4>
@@ -128,7 +129,7 @@
         <div class="flex flex-wrap justify-center gap-3 mb-12">
             @foreach($locations as $location)
                 <a href="{{ route('properties.index', ['area' => strtolower($location)]) }}"
-                   class="location-chip text-y2b-primary font-medium text-sm px-5 py-2 rounded-full hover:opacity-90 transition">
+                   class="inline-block bg-y2b-light text-y2b-primary border border-[#e2eaff] font-medium text-sm px-5 py-2 rounded-full hover:bg-y2b-primary hover:text-white hover:border-y2b-primary transition">
                     {{ $location }}
                 </a>
             @endforeach

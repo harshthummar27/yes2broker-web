@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initPropertyMobileSlider();
     initPropertyFaq();
     initPropertyInquiryModal();
+    initHomeLoanBankModal();
 });
 
 function initMobileMenu() {
@@ -391,6 +392,48 @@ function initPropertyInquiryModal() {
         trigger.addEventListener('click', (event) => {
             event.preventDefault();
             openModal();
+        });
+    });
+
+    closeBtn?.addEventListener('click', closeModal);
+    backdrop?.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+            closeModal();
+        }
+    });
+}
+
+function initHomeLoanBankModal() {
+    const modal = document.getElementById('home-loan-bank-modal');
+    const backdrop = document.getElementById('home-loan-bank-modal-backdrop');
+    const closeBtn = document.getElementById('home-loan-bank-modal-close');
+    const bankNameEl = document.getElementById('home-loan-bank-modal-name');
+    const bankInput = document.getElementById('home-loan-bank-modal-input');
+    const triggers = document.querySelectorAll('[data-open-home-loan-bank]');
+
+    if (!modal) return;
+
+    function openModal(bankName) {
+        if (bankNameEl) bankNameEl.textContent = bankName;
+        if (bankInput) bankInput.value = bankName;
+        modal.classList.add('is-open');
+        modal.classList.remove('hidden');
+        document.body.classList.add('consultation-modal-open');
+        closeBtn?.focus();
+    }
+
+    function closeModal() {
+        modal.classList.remove('is-open');
+        modal.classList.add('hidden');
+        document.body.classList.remove('consultation-modal-open');
+    }
+
+    triggers.forEach((trigger) => {
+        trigger.addEventListener('click', (event) => {
+            event.preventDefault();
+            openModal(trigger.dataset.bankName || '');
         });
     });
 

@@ -140,7 +140,7 @@
         <div class="flex flex-wrap justify-center gap-3 mb-12">
             @foreach($locations as $location)
                 <a href="{{ route('properties.index', ['area' => strtolower($location)]) }}"
-                   class="location-chip text-y2b-primary font-medium text-sm px-5 py-2 rounded-full hover:opacity-90 transition">
+                   class="inline-block bg-y2b-light text-y2b-primary border border-[#e2eaff] font-medium text-sm px-5 py-2 rounded-full hover:bg-y2b-primary hover:text-white hover:border-y2b-primary transition">
                     {{ $location }}
                 </a>
             @endforeach
