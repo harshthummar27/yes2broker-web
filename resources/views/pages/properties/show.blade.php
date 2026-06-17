@@ -165,14 +165,10 @@
     <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-2xl font-bold text-y2b-primary mb-6">360 Degree View</h2>
         <div class="rounded-2xl overflow-hidden shadow-md border border-gray-100">
-            <iframe
-                loading="lazy"
-                src="{{ $property['street_view_embed_url'] }}"
-                title="{{ $property['title'] }} street view"
-                class="w-full h-72 md:h-[480px] border-0"
-                allowfullscreen
-                referrerpolicy="no-referrer-when-downgrade">
-            </iframe>
+            <x-map-iframe
+                :src="$property['street_view_embed_url']"
+                :title="$property['title'].' street view'"
+                height="h-72 md:h-[480px]" />
         </div>
     </div>
 </section>
@@ -201,15 +197,10 @@
     <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-2xl font-bold text-y2b-primary mb-6">Project Location</h2>
         <div class="rounded-2xl overflow-hidden shadow-md border border-gray-100">
-            <iframe
-                loading="lazy"
-                src="{{ $property['map_embed_url'] }}"
-                title="{{ $property['title'] }} location"
-                aria-label="{{ $property['location'] }}"
-                class="w-full h-72 md:h-96 border-0"
-                allowfullscreen
-                referrerpolicy="no-referrer-when-downgrade">
-            </iframe>
+            <x-map-iframe
+                :src="$property['map_embed_url']"
+                :title="$property['title'].' location'"
+                height="h-72 md:h-96" />
         </div>
     </div>
 </section>

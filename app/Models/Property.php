@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\MapEmbed;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -67,7 +68,11 @@ class Property extends Model
             }
 
             if (blank($property->map_embed_url) && filled($property->location)) {
-                $property->map_embed_url = 'https://maps.google.com/maps?q='.rawurlencode($property->location).'&t=m&z=12&output=embed&iwloc=near';
+                $property->map_embed_url = MapEmbed::mapUrl($property->location);
+            }
+
+            if (blank($property->street_view_embed_url) && filled($property->location)) {
+                $property->street_view_embed_url = MapEmbed::streetViewUrl($property->location);
             }
 
             if (empty($property->gallery) && filled($property->image)) {
@@ -280,8 +285,8 @@ class Property extends Model
             ],
             'amenities' => $this->amenities ?? [],
             'faqs' => $this->faqs ?? [],
-            'map_embed_url' => $this->map_embed_url,
-            'street_view_embed_url' => $this->street_view_embed_url,
+            'map_embed_url' => $this->map_embed_url ?: (filled($this->location) ? MapEmbed::mapUrl($this->location) : null),
+            'street_view_embed_url' => $this->street_view_embed_url ?: (filled($this->location) ? MapEmbed::streetViewUrl($this->location) : null),
             'brochure_url' => $this->brochure_url,
             'is_new' => $this->is_new,
         ];

@@ -3,17 +3,26 @@
 @section('title', 'Contact')
 
 @section('content')
-{{-- Google Map --}}
-<section class="w-full">
-    <iframe
-        loading="lazy"
-        src="{{ config('site.maps_embed_url') }}"
-        title="{{ config('site.address') }}"
-        aria-label="{{ config('site.address') }}"
-        class="w-full h-72 md:h-96 border-0 grayscale-[20%]"
-        allowfullscreen
-        referrerpolicy="no-referrer-when-downgrade">
-    </iframe>
+{{-- Map + Street View --}}
+<section class="w-full bg-gray-50">
+    <div class="grid lg:grid-cols-2">
+        <div class="border-b lg:border-b-0 lg:border-r border-gray-200">
+            <x-map-iframe
+                :src="config('site.maps_embed_url')"
+                :title="config('site.address')"
+                height="h-72 md:h-[420px]"
+                class="grayscale-[20%]" />
+        </div>
+
+        @if(filled(config('site.street_view_embed_url')))
+            <div>
+                <x-map-iframe
+                    :src="config('site.street_view_embed_url')"
+                    title="Street view — {{ config('site.address') }}"
+                    height="h-72 md:h-[420px]" />
+            </div>
+        @endif
+    </div>
 </section>
 
 <section class="py-12 md:py-16 bg-gray-50">

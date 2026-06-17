@@ -8,7 +8,14 @@ return [
     'phone_href' => 'tel:+919512598980',
     'address' => '401 Amrakunj Avis Nigam nagar Near Tapovan Circle nagar, Chandkheda Ahmedabad, GUJARAT 382424',
     'maps_url' => 'https://www.google.com/maps/search/?api=1&query=401+Amrakunj+Avis+Nigam+nagar+Near+Tapovan+Circle+nagar+Chandkheda+Ahmedabad+Gujarat+382424',
-    'maps_embed_url' => 'https://maps.google.com/maps?q=401+Amrakunj+Avis+Nigam+nagar+Near+Tapovan+Circle+nagar,+Chandkheda+Ahmedabad,+GUJARAT+382424&t=m&z=10&output=embed&iwloc=near',
+    'maps_embed_url' => env(
+        'MAPS_EMBED_URL',
+        'https://maps.google.com/maps?q=401+Amrakunj+Avis+Nigam+nagar+Near+Tapovan+Circle+nagar,+Chandkheda+Ahmedabad,+GUJARAT+382424&t=m&z=10&output=embed&iwloc=near'
+    ),
+    'street_view_embed_url' => env(
+        'STREET_VIEW_EMBED_URL',
+        'https://maps.google.com/maps?layer=c&cbll=23.1176112,72.6117431&cbp=11,0,0,0,0&output=svembed'
+    ),
     'maps_directions_url' => 'https://www.google.com/maps/dir//Aamrakunj+Avis+Near,+Tapovan+Cir+Nigam+Nagar,+Chandkheda+Ahmedabad,+Gujarat+382424/@23.1176112,72.6117431,10z',
     'media_url' => 'https://yes2broker.in/wp-content/uploads',
     'hero_video' => 'https://yes2broker.in/wp-content/uploads/2025/07/yes2broker.mp4',
