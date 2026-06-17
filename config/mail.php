@@ -115,4 +115,15 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Enquiry Recipient
+    |--------------------------------------------------------------------------
+    |
+    | All public form submissions are delivered to this address.
+    |
+    */
+
+    'enquiry_to' => env('MAIL_ENQUIRY_TO', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
+
 ];

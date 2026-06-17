@@ -214,8 +214,9 @@
             <h2 class="text-3xl font-bold">Book Your Appointment</h2>
             <h2 class="text-xl text-blue-200 mt-1 mb-8">Free Consultation</h2>
 
-            <form action="#" method="POST" class="space-y-4">
+            <form action="{{ route('enquiry.consultation') }}" method="POST" class="space-y-4">
                 @csrf
+                <input type="hidden" name="source" value="Home Page">
                 <div class="grid sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm mb-1">First Name</label>

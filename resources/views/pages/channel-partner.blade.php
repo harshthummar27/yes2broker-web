@@ -19,8 +19,9 @@
 
         {{-- Partner Form --}}
         <div class="bg-gray-50 rounded-2xl shadow-lg p-6 md:p-8 lg:sticky lg:top-8">
-            <form action="#" method="POST" class="space-y-5">
+            <form action="{{ route('enquiry.channel-partner') }}" method="POST" class="space-y-5">
                 @csrf
+                <input type="hidden" name="source" value="Channel Partner Page">
 
                 <div class="grid sm:grid-cols-2 gap-5">
                     <div>

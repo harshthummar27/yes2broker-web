@@ -22,8 +22,9 @@
         </h2>
         <p class="text-gray-500 text-sm mt-1 mb-6">Free Consultation</p>
 
-        <form action="#" method="POST" class="space-y-4">
+        <form action="{{ route('enquiry.property-inquiry') }}" method="POST" class="space-y-4">
             @csrf
+            <input type="hidden" name="source" value="Property Inquiry Modal">
             <input type="hidden" name="property" value="{{ $propertyTitle }}">
 
             <div class="grid sm:grid-cols-2 gap-4">

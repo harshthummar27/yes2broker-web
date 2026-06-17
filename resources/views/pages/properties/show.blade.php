@@ -268,8 +268,9 @@
                 <h3 class="text-xl font-bold text-y2b-primary mb-1">Get in Touch</h3>
                 <p class="text-gray-500 text-sm mb-6">Share your details for {{ $property['title'] }}</p>
 
-                <form action="#" method="POST" class="space-y-4">
+                <form action="{{ route('enquiry.property-inquiry') }}" method="POST" class="space-y-4">
                     @csrf
+                    <input type="hidden" name="source" value="Property Detail Page">
                     <input type="hidden" name="property" value="{{ $property['title'] }}">
 
                     <div>

@@ -34,8 +34,9 @@
             <h2 id="consultation-modal-title" class="text-xl font-bold text-y2b-primary">Book Your Appointment</h2>
             <p class="text-gray-500 text-sm mt-1 mb-6">Free Consultation</p>
 
-            <form action="#" method="POST" class="space-y-4">
+            <form action="{{ route('enquiry.consultation') }}" method="POST" class="space-y-4">
                 @csrf
+                <input type="hidden" name="source" value="Consultation Modal">
                 <div class="grid sm:grid-cols-2 gap-4">
                     <div>
                         <label for="modal_first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>

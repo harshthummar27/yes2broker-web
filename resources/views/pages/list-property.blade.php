@@ -42,9 +42,10 @@
     <div class="max-w-4xl mx-auto px-4">
         <h3 class="text-2xl font-bold text-y2b-primary text-center mb-10">Enter Your Property Details</h3>
 
-        <form action="#" method="POST" enctype="multipart/form-data"
+        <form action="{{ route('enquiry.list-property') }}" method="POST" enctype="multipart/form-data"
               class="bg-white rounded-2xl shadow-lg p-6 md:p-10 space-y-6">
             @csrf
+            <input type="hidden" name="source" value="List Property Page">
 
             <div class="grid md:grid-cols-2 gap-6">
                 <div>

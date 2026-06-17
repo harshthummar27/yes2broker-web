@@ -20,8 +20,9 @@
         </h2>
         <p class="text-gray-500 text-sm mt-1 mb-6">Fill in your details and our team will get back to you.</p>
 
-        <form action="#" method="POST" class="space-y-4">
+        <form action="{{ route('enquiry.home-loan') }}" method="POST" class="space-y-4">
             @csrf
+            <input type="hidden" name="source" value="Home Loan Bank Modal">
             <input type="hidden" name="bank" id="home-loan-bank-modal-input" value="">
 
             <input type="text" name="name" required placeholder="Name"

@@ -21,8 +21,9 @@
 
             <div class="bg-gray-50 rounded-2xl shadow-lg p-5 md:p-6">
                 <h2 class="text-xl font-bold text-y2b-primary mb-5">Let's get you started</h2>
-                <form action="#" method="POST" class="space-y-4">
+                <form action="{{ route('enquiry.home-loan') }}" method="POST" class="space-y-4">
                     @csrf
+                    <input type="hidden" name="source" value="Home Loan Page">
                     <input type="text" name="name" placeholder="Name"
                            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary bg-white text-sm">
                     <input type="tel" name="phone" placeholder="Telephone"

@@ -43,8 +43,9 @@
         <h3 class="text-xl md:text-2xl font-bold text-y2b-primary mb-4">
             Subscribe our Newsletter and Get latest property update.
         </h3>
-        <form action="#" method="POST" class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+        <form action="{{ route('enquiry.newsletter') }}" method="POST" class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
             @csrf
+            <input type="hidden" name="source" value="About Page Newsletter">
             <input type="email" name="email" required placeholder="Enter your email"
                    class="flex-1 px-4 py-3 rounded-lg border border-gray-300 outline-none focus:border-y2b-primary">
             <button type="submit"

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\EnquiryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ChannelPartnerController;
 use App\Http\Controllers\ContactController;
@@ -25,3 +26,10 @@ Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::get('/list-your-property', [ListPropertyController::class, 'index'])->name('list-property');
 Route::get('/become-channel-partner', [ChannelPartnerController::class, 'index'])->name('channel-partner');
 Route::get('/home-loan', [HomeLoanController::class, 'index'])->name('home-loan');
+
+Route::post('/enquiry/consultation', [EnquiryController::class, 'consultation'])->name('enquiry.consultation');
+Route::post('/enquiry/newsletter', [EnquiryController::class, 'newsletter'])->name('enquiry.newsletter');
+Route::post('/enquiry/channel-partner', [EnquiryController::class, 'channelPartner'])->name('enquiry.channel-partner');
+Route::post('/enquiry/list-property', [EnquiryController::class, 'listProperty'])->name('enquiry.list-property');
+Route::post('/enquiry/home-loan', [EnquiryController::class, 'homeLoan'])->name('enquiry.home-loan');
+Route::post('/enquiry/property-inquiry', [EnquiryController::class, 'propertyInquiry'])->name('enquiry.property-inquiry');
