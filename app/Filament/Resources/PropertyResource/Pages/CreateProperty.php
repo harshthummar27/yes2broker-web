@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PropertyResource\Pages;
 
 use App\Filament\Resources\PropertyResource;
+use App\Support\MapEmbed;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 
@@ -54,6 +55,9 @@ class CreateProperty extends CreateRecord
         }
 
         unset($data['image_upload'], $data['gallery_uploads']);
+
+        $data['map_embed_url'] = MapEmbed::normalizeEmbedInput($data['map_embed_url'] ?? null);
+        $data['street_view_embed_url'] = MapEmbed::normalizeEmbedInput($data['street_view_embed_url'] ?? null);
 
         return $data;
     }

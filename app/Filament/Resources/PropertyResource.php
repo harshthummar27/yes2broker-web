@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PropertyResource\Pages;
 use App\Models\Property;
+use App\Support\MapEmbed;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -176,14 +177,17 @@ class PropertyResource extends Resource
                             ])
                             ->defaultItems(0)
                             ->columnSpanFull(),
-                        Forms\Components\TextInput::make('map_embed_url')
-                            ->label('Google Maps Embed URL')
-                            ->url()
+                        Forms\Components\Textarea::make('map_embed_url')
+                            ->label('Google Maps Embed')
+                            ->rows(4)
+                            ->helperText('Paste the full <iframe> code from Google Maps → Share → Embed a map, or paste only the embed URL.')
+                            ->dehydrateStateUsing(fn (?string $state): ?string => MapEmbed::normalizeEmbedInput($state))
                             ->columnSpanFull(),
-                        Forms\Components\TextInput::make('street_view_embed_url')
-                            ->label('360° / Street View Embed URL')
-                            ->url()
-                            ->helperText('Paste the Google Street View iframe URL from the old site.')
+                        Forms\Components\Textarea::make('street_view_embed_url')
+                            ->label('360° / Street View Embed')
+                            ->rows(4)
+                            ->helperText('Paste the full <iframe> code or only the Street View embed URL.')
+                            ->dehydrateStateUsing(fn (?string $state): ?string => MapEmbed::normalizeEmbedInput($state))
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('brochure_url')
                             ->label('Brochure PDF URL')

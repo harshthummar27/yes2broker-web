@@ -24,4 +24,27 @@ class MapEmbed
             $longitude
         );
     }
+
+    public static function normalizeEmbedInput(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim(html_entity_decode($value, ENT_QUOTES | ENT_HTML5));
+
+        if ($value === '') {
+            return null;
+        }
+
+        if (preg_match('/<iframe[^>]+src=["\']([^"\']+)["\']/i', $value, $matches)) {
+            return trim($matches[1]);
+        }
+
+        if (preg_match('/src=["\']([^"\']+)["\']/i', $value, $matches)) {
+            return trim($matches[1]);
+        }
+
+        return $value;
+    }
 }

@@ -208,6 +208,20 @@ class Property extends Model
         return Attribute::get(fn () => self::resolveMediaUrl($this->image));
     }
 
+    protected function mapEmbedUrl(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => MapEmbed::normalizeEmbedInput($value),
+        );
+    }
+
+    protected function streetViewEmbedUrl(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => MapEmbed::normalizeEmbedInput($value),
+        );
+    }
+
     public function postcode(): string
     {
         if (preg_match('/\b(\d{6})\b/', $this->location, $matches)) {
