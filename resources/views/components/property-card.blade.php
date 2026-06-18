@@ -6,7 +6,7 @@
         <img src="{{ $property['image'] }}" alt="{{ $property['title'] }}"
              class="property-card-image w-full h-full object-cover" loading="lazy">
         @if($property['is_new'] ?? true)
-            <span class="absolute top-3 right-3 bg-y2b-accent text-white text-xs font-bold px-3 py-1 rounded">New</span>
+            <span class="absolute top-3 right-3 bg-y2b-primary text-white text-xs font-bold px-3 py-1 rounded">New</span>
         @endif
     </div>
     <div class="p-4">

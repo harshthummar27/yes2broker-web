@@ -62,7 +62,7 @@ function initFeaturedCarousel() {
             slide.classList.toggle('hidden', i !== index);
         });
         dots.forEach((dot, i) => {
-            dot.classList.toggle('bg-y2b-accent', i === index);
+            dot.classList.toggle('bg-white', i === index);
             dot.classList.toggle('bg-white/40', i !== index);
         });
         current = index;

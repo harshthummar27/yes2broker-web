@@ -152,7 +152,7 @@
         <h2 class="text-3xl font-bold text-y2b-primary">Testimonials</h2>
         <h2 class="text-xl text-gray-600 mt-2 mb-10">What Our Clients Say?</h2>
         <div class="bg-white rounded-xl shadow-md p-8 max-w-2xl mx-auto">
-            <div class="flex justify-center gap-1 text-y2b-accent mb-4">
+            <div class="flex justify-center gap-1 text-amber-500 mb-4">
                 @for($i = 0; $i < 5; $i++)
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                 @endfor
@@ -256,7 +256,7 @@
                               class="w-full bg-white/10 border border-white/30 rounded px-4 py-2.5 text-white placeholder:text-blue-200 outline-none focus:border-white resize-none"></textarea>
                 </div>
                 <button type="submit"
-                        class="bg-y2b-accent hover:bg-yellow-500 text-y2b-primary font-bold px-8 py-3 rounded transition">
+                        class="bg-white hover:bg-y2b-light text-y2b-primary font-bold px-8 py-3 rounded transition">
                     Submit Request
                 </button>
             </form>
@@ -303,7 +303,7 @@
             <div class="flex justify-center gap-2 mt-4">
                 @foreach($featuredCarousel as $index => $featured)
                     <button type="button" data-featured-dot="{{ $index }}"
-                            class="w-2.5 h-2.5 rounded-full transition {{ $index === 0 ? 'bg-y2b-accent' : 'bg-white/40' }}"
+                            class="w-2.5 h-2.5 rounded-full transition {{ $index === 0 ? 'bg-white' : 'bg-white/40' }}"
                             aria-label="Slide {{ $index + 1 }}"></button>
                 @endforeach
             </div>
