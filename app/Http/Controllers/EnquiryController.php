@@ -10,14 +10,14 @@ use App\Http\Requests\StoreHomeLoanRequest;
 use App\Http\Requests\StoreListPropertyRequest;
 use App\Http\Requests\StoreNewsletterRequest;
 use App\Http\Requests\StorePropertyInquiryRequest;
-use App\Services\EnquiryMailer;
+use App\Services\EnquiryDispatcher;
 use Illuminate\Http\RedirectResponse;
 use Throwable;
 
 class EnquiryController extends Controller
 {
     public function __construct(
-        private readonly EnquiryMailer $enquiryMailer,
+        private readonly EnquiryDispatcher $enquiryDispatcher,
     ) {}
 
     public function consultation(StoreConsultationRequest $request): RedirectResponse
@@ -102,7 +102,7 @@ class EnquiryController extends Controller
         $source = $data['source'] ?? null;
 
         try {
-            $this->enquiryMailer->send($title, $data, is_string($source) ? $source : null, $uploads);
+            $this->enquiryDispatcher->dispatch($title, $data, is_string($source) ? $source : null, $uploads);
         } catch (Throwable $exception) {
             report($exception);
 
