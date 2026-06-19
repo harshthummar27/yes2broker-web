@@ -1,10 +1,10 @@
 @props(['property'])
 
 <a href="{{ route('properties.show', $property['slug']) }}"
-   class="property-card block bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow shrink-0 w-[300px] md:w-[320px]">
-    <div class="relative overflow-hidden h-52">
+   class="property-card block bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow shrink-0">
+    <div class="relative overflow-hidden aspect-[16/9] bg-gray-100 md:aspect-auto md:h-52">
         <img src="{{ $property['image'] }}" alt="{{ $property['title'] }}"
-             class="property-card-image w-full h-full object-cover" loading="lazy">
+             class="property-card-image w-full h-full object-cover object-center" loading="lazy">
         @if($property['is_new'] ?? true)
             <span class="absolute top-3 right-3 bg-y2b-primary text-white text-xs font-bold px-3 py-1 rounded">New</span>
         @endif

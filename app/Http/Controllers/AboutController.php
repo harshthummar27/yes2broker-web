@@ -15,7 +15,6 @@ class AboutController extends Controller
             'highlights' => AboutPageData::highlights(),
             'services' => AboutPageData::services(),
             'howItWorks' => AboutPageData::howItWorks(),
-            'team' => AboutPageData::team(),
             'partners' => HomePageData::partners(),
             'locations' => HomePageData::locations(),
         ]);

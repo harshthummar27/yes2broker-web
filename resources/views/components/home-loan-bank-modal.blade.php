@@ -27,10 +27,10 @@
 
             <input type="text" name="name" required placeholder="Name"
                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary bg-white text-sm">
-            <input type="tel" name="phone" required placeholder="Telephone"
-                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary bg-white text-sm">
-            <input type="email" name="email" required placeholder="Email"
-                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary bg-white text-sm">
+            <x-form-mobile-input name="phone" placeholder="Mobile Number"
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary bg-white text-sm" />
+            <x-form-email-input name="email" placeholder="Email"
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary bg-white text-sm" />
             <input type="text" name="amount" placeholder="Loan Amount"
                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary bg-white text-sm">
 

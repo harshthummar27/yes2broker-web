@@ -38,7 +38,7 @@
     animation: partner-scroll 25s linear infinite;
 }
 
-/* Property carousel */
+/* Property carousel — Our Listing */
 .property-carousel::-webkit-scrollbar {
     display: none;
 }
@@ -46,6 +46,51 @@
 .property-carousel {
     -ms-overflow-style: none;
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.property-carousel > .property-card {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 767px) {
+    .property-carousel-wrap {
+        margin-inline: 0;
+    }
+
+    .property-carousel {
+        --carousel-pad: 0.75rem;
+        --carousel-gap: 0.75rem;
+        padding-inline: var(--carousel-pad);
+        gap: var(--carousel-gap);
+        scroll-padding-inline: var(--carousel-pad);
+    }
+
+    .property-carousel > .property-card {
+        flex: 0 0 100%;
+        width: 100%;
+        max-width: 100%;
+        scroll-snap-align: center;
+        scroll-snap-stop: always;
+    }
+}
+
+@media (min-width: 768px) {
+    .property-carousel {
+        scroll-snap-type: none;
+    }
+
+    .property-carousel > .property-card {
+        width: 300px;
+        max-width: 300px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .property-carousel > .property-card {
+        width: 320px;
+        max-width: 320px;
+    }
 }
 
 /* Hero property search bar */

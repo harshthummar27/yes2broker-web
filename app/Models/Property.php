@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Data\HomePageData;
 use App\Support\MapEmbed;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -182,21 +183,11 @@ class Property extends Model
         }
 
         if (! empty($filters['budget'])) {
-            $minLakhs = match ($filters['budget']) {
-                '50l' => 50,
-                '60l' => 60,
-                '70l' => 70,
-                '80l' => 80,
-                '90l' => 90,
-                '1cr' => 100,
-                '2cr' => 200,
-                '5cr' => 500,
-                '10cr' => 1000,
-                default => 0,
-            };
+            $maxBudgetLakhs = HomePageData::budgetMaxLakhs($filters['budget']);
 
-            if ($minLakhs > 0) {
-                $query->where('price_min_lakhs', '>=', $minLakhs);
+            if ($maxBudgetLakhs !== null) {
+                $query->where('price_min_lakhs', '>', 0)
+                    ->where('price_min_lakhs', '<=', $maxBudgetLakhs);
             }
         }
 
@@ -308,10 +299,11 @@ class Property extends Model
 
     public static function parsePriceMinLakhs(string $price): float
     {
-        if (preg_match('/₹?\s*([\d.]+)\s*(Lakhs?|L\b|Cr)/i', $price, $matches)) {
+        if (preg_match('/₹?\s*([\d.]+)\s*(Cr(?:ore)?|Lakhs?|Lacs?|L\b)/i', $price, $matches)) {
             $value = (float) $matches[1];
+            $unit = strtolower($matches[2]);
 
-            return str_contains(strtolower($matches[2]), 'cr') ? $value * 100 : $value;
+            return str_starts_with($unit, 'c') ? $value * 100 : $value;
         }
 
         return 0;

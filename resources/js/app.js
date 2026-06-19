@@ -2,6 +2,7 @@ import './bootstrap';
 
 document.addEventListener('DOMContentLoaded', () => {
     initMobileMenu();
+    initFormValidation();
     initPropertyCarousel();
     initFeaturedCarousel();
     initLocalityTabs();
@@ -15,6 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
     initPropertyInquiryModal();
     initHomeLoanBankModal();
 });
+
+function initFormValidation() {
+    document.querySelectorAll('input[type="tel"][name="phone"], input[type="tel"][name="mobile"], input[type="tel"][name="alternate_phone"]').forEach((input) => {
+        input.addEventListener('input', () => {
+            input.value = input.value.replace(/\D/g, '').slice(0, 10);
+        });
+    });
+}
 
 function initMobileMenu() {
     const toggle = document.getElementById('mobile-menu-toggle');
@@ -36,17 +45,112 @@ function initPropertyCarousel() {
     const carousel = document.getElementById('property-carousel');
     const prev = document.getElementById('carousel-prev');
     const next = document.getElementById('carousel-next');
+    const dots = document.querySelectorAll('[data-listing-carousel-dot]');
 
-    if (!carousel || !prev || !next) return;
+    if (!carousel) return;
 
-    const scrollAmount = 340;
+    const cards = () => [...carousel.querySelectorAll('.property-card')];
 
-    prev.addEventListener('click', () => {
-        carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    function isMobileView() {
+        return window.matchMedia('(max-width: 767px)').matches;
+    }
+
+    function getScrollStep() {
+        const card = carousel.querySelector('.property-card');
+        if (!card) {
+            return 340;
+        }
+
+        const gap = parseFloat(getComputedStyle(carousel).columnGap || getComputedStyle(carousel).gap) || 16;
+
+        return card.getBoundingClientRect().width + gap;
+    }
+
+    function getMobileActiveIndex() {
+        const items = cards();
+        if (items.length === 0) {
+            return 0;
+        }
+
+        const scrollCenter = carousel.scrollLeft + carousel.clientWidth / 2;
+        let activeIndex = 0;
+        let minDistance = Infinity;
+
+        items.forEach((card, index) => {
+            const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+            const distance = Math.abs(cardCenter - scrollCenter);
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                activeIndex = index;
+            }
+        });
+
+        return activeIndex;
+    }
+
+    function setActiveDot(activeIndex) {
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('bg-y2b-primary', index === activeIndex);
+            dot.classList.toggle('bg-gray-300', index !== activeIndex);
+        });
+    }
+
+    function scrollToIndex(index, behavior = 'smooth') {
+        const items = cards();
+        const card = items[index];
+
+        if (!card) {
+            return;
+        }
+
+        card.scrollIntoView({ behavior, inline: 'center', block: 'nearest' });
+        setActiveDot(index);
+    }
+
+    function scrollCarousel(direction) {
+        const items = cards();
+        if (items.length === 0) {
+            return;
+        }
+
+        const step = getScrollStep();
+        const maxScroll = Math.max(0, carousel.scrollWidth - carousel.clientWidth);
+        const target = direction === 'next'
+            ? Math.min(carousel.scrollLeft + step, maxScroll)
+            : Math.max(carousel.scrollLeft - step, 0);
+
+        carousel.scrollTo({ left: target, behavior: 'smooth' });
+    }
+
+    if (dots.length > 0) {
+        let raf = null;
+
+        carousel.addEventListener('scroll', () => {
+            if (!isMobileView()) {
+                return;
+            }
+
+            if (raf) cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(() => setActiveDot(getMobileActiveIndex()));
+        }, { passive: true });
+
+        dots.forEach((dot) => {
+            dot.addEventListener('click', () => {
+                const index = parseInt(dot.dataset.listingCarouselDot || '0', 10);
+                scrollToIndex(index);
+            });
+        });
+    }
+
+    prev?.addEventListener('click', (event) => {
+        event.preventDefault();
+        scrollCarousel('prev');
     });
 
-    next.addEventListener('click', () => {
-        carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    next?.addEventListener('click', (event) => {
+        event.preventDefault();
+        scrollCarousel('next');
     });
 }
 

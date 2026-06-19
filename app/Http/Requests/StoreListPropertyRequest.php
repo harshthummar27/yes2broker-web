@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Http\Requests\Concerns\SanitizesPhoneFields;
+use App\Support\ValidationRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreListPropertyRequest extends FormRequest
 {
+    use SanitizesPhoneFields;
+
     public function authorize(): bool
     {
         return true;
@@ -20,9 +24,9 @@ class StoreListPropertyRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'phone' => ['required', 'string', 'max:20'],
-            'alternate_phone' => ['required', 'string', 'max:20'],
+            'email' => ValidationRules::email(),
+            'phone' => ValidationRules::mobile(),
+            'alternate_phone' => ValidationRules::mobile(),
             'property_title' => ['required', 'string', 'max:255'],
             'type' => ['nullable', 'string', 'max:255'],
             'status' => ['nullable', 'string', 'max:50'],
@@ -34,5 +38,13 @@ class StoreListPropertyRequest extends FormRequest
             'verification' => ['accepted'],
             'source' => ['nullable', 'string', 'max:100'],
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return ValidationRules::contactMessages();
     }
 }

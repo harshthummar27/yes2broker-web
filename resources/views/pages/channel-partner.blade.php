@@ -31,16 +31,16 @@
                     </div>
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-                        <input type="email" id="email" name="email" required placeholder="Jhon.doe@status.com"
-                               class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary bg-white">
+                        <x-form-email-input id="email" name="email" placeholder="Jhon.doe@status.com"
+                               class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary bg-white" />
                     </div>
                 </div>
 
                 <div class="grid sm:grid-cols-2 gap-5">
                     <div>
                         <label for="mobile" class="block text-sm font-medium text-gray-700 mb-1.5">Mobile</label>
-                        <input type="tel" id="mobile" name="mobile" placeholder="+91 52452 652145"
-                               class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary bg-white">
+                        <x-form-mobile-input id="mobile" name="mobile" :required="false" placeholder="Mobile Number"
+                               class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary bg-white" />
                     </div>
                     <div>
                         <label for="city" class="block text-sm font-medium text-gray-700 mb-1.5">City</label>

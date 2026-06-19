@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Support\ValidationRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreNewsletterRequest extends FormRequest
@@ -19,8 +20,16 @@ class StoreNewsletterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email', 'max:255'],
+            'email' => ValidationRules::email(),
             'source' => ['nullable', 'string', 'max:100'],
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return ValidationRules::emailMessages();
     }
 }

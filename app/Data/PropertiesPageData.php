@@ -3271,19 +3271,14 @@ class PropertiesPageData
         }
 
         if (! empty($filters['budget'])) {
-            $minLakhs = match ($filters['budget']) {
-                '50l' => 50,
-                '60l' => 60,
-                '70l' => 70,
-                '80l' => 80,
-                '90l' => 90,
-                '1cr' => 100,
-                '2cr' => 200,
-                '5cr' => 500,
-                '10cr' => 1000,
-                default => 0,
-            };
-            $items = array_values(array_filter($items, fn (array $p) => self::priceMinLakhs($p['price']) >= $minLakhs));
+            $maxBudgetLakhs = \App\Data\HomePageData::budgetMaxLakhs($filters['budget']);
+
+            if ($maxBudgetLakhs !== null) {
+                $items = array_values(array_filter(
+                    $items,
+                    fn (array $p) => ($lakhs = self::priceMinLakhs($p['price'])) > 0 && $lakhs <= $maxBudgetLakhs
+                ));
+            }
         }
 
         return $items;

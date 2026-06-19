@@ -3,28 +3,6 @@
 @section('title', 'Contact')
 
 @section('content')
-{{-- Map + Street View --}}
-<section class="w-full bg-gray-50">
-    <div class="grid lg:grid-cols-2">
-        <div class="border-b lg:border-b-0 lg:border-r border-gray-200">
-            <x-map-iframe
-                :src="config('site.maps_embed_url')"
-                :title="config('site.address')"
-                height="h-72 md:h-[420px]"
-                class="grayscale-[20%]" />
-        </div>
-
-        @if(filled(config('site.street_view_embed_url')))
-            <div>
-                <x-map-iframe
-                    :src="config('site.street_view_embed_url')"
-                    title="Street view — {{ config('site.address') }}"
-                    height="h-72 md:h-[420px]" />
-            </div>
-        @endif
-    </div>
-</section>
-
 <section class="py-12 md:py-16 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-10 lg:gap-14 items-start">
         {{-- Contact Details --}}
@@ -99,13 +77,13 @@
                 <div class="grid sm:grid-cols-2 gap-5">
                     <div>
                         <label for="phone" class="block text-sm font-medium text-gray-700 mb-1.5">Phone</label>
-                        <input type="tel" id="phone" name="phone" required placeholder="Phone Number"
-                               class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary">
+                        <x-form-mobile-input id="phone" name="phone" placeholder="Mobile Number"
+                               class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary" />
                     </div>
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-                        <input type="email" id="email" name="email" required placeholder="Email"
-                               class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary">
+                        <x-form-email-input id="email" name="email" placeholder="Email"
+                               class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary" />
                     </div>
                 </div>
 
@@ -130,6 +108,19 @@
                     Submit Request
                 </button>
             </form>
+        </div>
+    </div>
+</section>
+
+{{-- Map --}}
+<section class="w-full bg-gray-50 pb-12 md:pb-16">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="rounded-2xl overflow-hidden shadow-lg">
+            <x-map-iframe
+                :src="config('site.maps_embed_url')"
+                :title="config('site.address')"
+                height="h-72 md:h-[420px]"
+                class="grayscale-[20%]" />
         </div>
     </div>
 </section>

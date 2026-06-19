@@ -53,13 +53,13 @@
                 <div class="grid sm:grid-cols-2 gap-4">
                     <div>
                         <label for="modal_phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                        <input type="tel" id="modal_phone" name="phone" required placeholder="Phone Number"
-                               class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary">
+                        <x-form-mobile-input id="modal_phone" name="phone" placeholder="Mobile Number"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary" />
                     </div>
                     <div>
                         <label for="modal_email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" id="modal_email" name="email" required placeholder="Email"
-                               class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary">
+                        <x-form-email-input id="modal_email" name="email" placeholder="Email"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary" />
                     </div>
                 </div>
 

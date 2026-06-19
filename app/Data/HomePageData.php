@@ -246,16 +246,32 @@ class HomePageData
     {
         return [
             '' => 'Select Budget',
-            '50l' => '₹50 Lac',
-            '60l' => '₹60 Lac',
-            '70l' => '₹70 Lac',
-            '80l' => '₹80 Lac',
-            '90l' => '₹90 Lac',
-            '1cr' => '₹1 Cr',
-            '2cr' => '₹2 Cr',
-            '5cr' => '₹5 Cr',
-            '10cr' => '₹10 Cr+',
+            '50l' => 'Up to ₹50 Lac',
+            '60l' => 'Up to ₹60 Lac',
+            '70l' => 'Up to ₹70 Lac',
+            '80l' => 'Up to ₹80 Lac',
+            '90l' => 'Up to ₹90 Lac',
+            '1cr' => 'Up to ₹1 Cr',
+            '2cr' => 'Up to ₹2 Cr',
+            '5cr' => 'Up to ₹5 Cr',
+            '10cr' => 'Up to ₹10 Cr',
         ];
+    }
+
+    public static function budgetMaxLakhs(string $budget): ?float
+    {
+        return match ($budget) {
+            '50l' => 50,
+            '60l' => 60,
+            '70l' => 70,
+            '80l' => 80,
+            '90l' => 90,
+            '1cr' => 100,
+            '2cr' => 200,
+            '5cr' => 500,
+            '10cr' => 1000,
+            default => null,
+        };
     }
 
     public static function consultationOptions(): array

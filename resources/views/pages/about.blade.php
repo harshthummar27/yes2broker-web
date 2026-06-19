@@ -13,14 +13,14 @@
                  class="rounded-2xl shadow-lg max-w-lg w-full">
         </div>
         <div>
-            <h2 class="text-sm font-semibold text-y2b-accent uppercase tracking-wide">About Company</h2>
+            <span class="text-sm font-semibold text-y2b-primary uppercase tracking-wide">About Company</span>
             <h2 class="text-3xl font-bold text-y2b-primary mt-2 mb-4">Welcome to Yes2Broker</h2>
             <p class="text-gray-600 leading-relaxed mb-6">
                 we simplify real estate for buyers, sellers, and investors. Based in Ahmedabad, we bring you a curated selection of properties backed by transparent processes, expert guidance, and unmatched local knowledge.
             </p>
             <ul class="space-y-3 mb-8">
                 @foreach($highlights as $point)
-                    <li class="flex items-center gap-3 text-gray-700">
+                    <li class="flex items-center gap-3 text-gray-600">
                         <svg class="w-5 h-5 text-y2b-primary shrink-0" fill="currentColor" viewBox="0 0 512 512"><path d="M504 256C504 119 393 8 256 8S8 119 8 256s111 248 248 248 248-111 248-248zm-448 0c0-110.5 89.5-200 200-200s200 89.5 200 200-89.5 200-200 200S56 366.5 56 256zm72 20v-40c0-6.6 5.4-12 12-12h116v-67c0-10.7 12.9-16 20.5-8.5l99 99c4.7 4.7 4.7 12.3 0 17l-99 99c-7.6 7.6-20.5 2.2-20.5-8.5v-67H140c-6.6 0-12-5.4-12-12z"/></svg>
                         {{ $point }}
                     </li>
@@ -46,8 +46,8 @@
         <form action="{{ route('enquiry.newsletter') }}" method="POST" class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
             @csrf
             <input type="hidden" name="source" value="About Page Newsletter">
-            <input type="email" name="email" required placeholder="Enter your email"
-                   class="flex-1 px-4 py-3 rounded-lg border border-gray-300 outline-none focus:border-y2b-primary">
+            <x-form-email-input name="email" placeholder="Enter your email"
+                   class="flex-1 px-4 py-3 rounded-lg border border-gray-300 outline-none focus:border-y2b-primary" />
             <button type="submit"
                     class="bg-y2b-primary hover:bg-y2b-primary-dark text-white font-semibold px-6 py-3 rounded-lg transition whitespace-nowrap">
                 Join Our Newsletter!
@@ -158,27 +158,4 @@
     </div>
 </section>
 
-{{-- Team --}}
-<section class="py-16 bg-white">
-    <div class="max-w-7xl mx-auto px-4">
-        <div class="text-center mb-10">
-            <h2 class="text-3xl font-bold text-y2b-primary">Meet Our Team</h2>
-            <p class="text-gray-500 mt-2">Expert consultants dedicated to your property journey</p>
-        </div>
-
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            @foreach($team as $member)
-                <div class="text-center group">
-                    <div class="w-28 h-28 mx-auto rounded-full bg-y2b-light flex items-center justify-center mb-4 group-hover:bg-y2b-primary/10 transition">
-                        <svg class="w-14 h-14 text-y2b-primary/60" fill="currentColor" viewBox="0 0 512 512">
-                            <path d="M256 288c79.5 0 144-64.5 144-144S335.5 0 256 0 112 64.5 112 144s64.5 144 144 144zm128 32h-55.1c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16H128C57.3 320 0 377.3 0 448v16c0 26.5 21.5 48 48 48h416c26.5 0 48-21.5 48-48v-16c0-70.7-57.3-128-128-128z"/>
-                        </svg>
-                    </div>
-                    <h4 class="font-bold text-y2b-primary text-lg">{{ $member['name'] }}</h4>
-                    <p class="text-sm text-gray-500 mt-1">{{ $member['role'] }}</p>
-                </div>
-            @endforeach
-        </div>
-    </div>
-</section>
 @endsection

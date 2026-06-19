@@ -41,20 +41,21 @@
 </section>
 
 {{-- Trending Properties --}}
-<section class="py-14">
-    <div class="max-w-7xl mx-auto px-2">
+<section class="py-14 overflow-x-hidden">
+    <div class="max-w-7xl mx-auto px-3 md:px-2">
         <div class="text-center mb-10">
             <h2 class="text-3xl font-bold text-y2b-primary">Our Listing</h2>
             <h4 class="text-gray-500 mt-2">Trending Properties at Ahmedabad</h4>
         </div>
 
-        <div class="relative">
+        <div class="property-carousel-wrap relative px-0 md:px-14">
             <button id="carousel-prev" type="button" aria-label="Previous"
-                    class="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center text-y2b-primary hover:bg-y2b-primary hover:text-white transition -ml-2 md:-ml-5">
+                    class="absolute left-1 md:left-0 top-1/2 -translate-y-1/2 z-20 w-9 h-9 md:w-10 md:h-10 bg-white shadow-lg rounded-full hidden md:flex items-center justify-center text-y2b-primary hover:bg-y2b-primary hover:text-white transition cursor-pointer">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 1000 1000"><path d="M646 125C629 125 613 133 604 142L308 442C296 454 292 471 292 487 292 504 296 521 308 533L604 854C617 867 629 875 646 875 663 875 679 871 692 858 704 846 713 829 713 812 713 796 708 779 692 767L438 487 692 225C700 217 708 204 708 187 708 171 704 154 692 142 675 129 663 125 646 125Z"/></svg>
             </button>
 
-            <div id="property-carousel" class="property-carousel flex gap-5 overflow-x-auto scroll-smooth px-8 pb-4">
+            <div id="property-carousel"
+                 class="property-carousel property-mobile-track relative z-0 flex max-md:gap-0 gap-4 md:gap-6 overflow-x-auto scroll-smooth pb-4 max-md:snap-x max-md:snap-mandatory">
                 @forelse($trendingProperties as $property)
                     <x-property-card :property="$property" />
                 @empty
@@ -68,9 +69,22 @@
             </div>
 
             <button id="carousel-next" type="button" aria-label="Next"
-                    class="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center text-y2b-primary hover:bg-y2b-primary hover:text-white transition -mr-2 md:-mr-5">
+                    class="absolute right-1 md:right-0 top-1/2 -translate-y-1/2 z-20 w-9 h-9 md:w-10 md:h-10 bg-white shadow-lg rounded-full hidden md:flex items-center justify-center text-y2b-primary hover:bg-y2b-primary hover:text-white transition cursor-pointer">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 1000 1000"><path d="M696 533C708 521 713 504 713 487 713 471 708 454 696 446L400 146C388 133 375 125 354 125 338 125 325 129 313 142 300 154 292 171 292 187 292 204 296 221 308 233L563 492 304 771C292 783 288 800 288 817 288 833 296 850 308 863 321 871 338 875 354 875 371 875 388 867 400 854L696 533Z"/></svg>
             </button>
+
+            @if(count($trendingProperties) > 1)
+                <div class="flex items-center justify-center gap-2 mt-3 md:hidden" data-listing-carousel-dots>
+                    @foreach($trendingProperties as $index => $property)
+                        <button
+                            type="button"
+                            class="w-2.5 h-2.5 rounded-full {{ $index === 0 ? 'bg-y2b-primary' : 'bg-gray-300' }}"
+                            aria-label="Go to property {{ $index + 1 }}"
+                            data-listing-carousel-dot="{{ $index }}"
+                        ></button>
+                    @endforeach
+                </div>
+            @endif
         </div>
 
         <div class="text-center mt-8">
@@ -92,7 +106,7 @@
             </div>
         </div>
         <div>
-            <h2 class="text-sm font-semibold text-y2b-accent uppercase tracking-wide">About Company</h2>
+            <span class="text-sm font-semibold text-y2b-primary uppercase tracking-wide">About Company</span>
             <h2 class="text-3xl font-bold text-y2b-primary mt-2 mb-4">Welcome to Yes2Broker</h2>
             <p class="text-gray-600 leading-relaxed mb-6">
                 we simplify real estate for buyers, sellers, and investors. Based in Ahmedabad, we bring you a curated selection of properties backed by transparent processes, expert guidance, and unmatched local knowledge.
@@ -103,7 +117,7 @@
                     'Get early access to exclusive listings',
                     '24/7 support for urgent property needs',
                 ] as $point)
-                    <li class="flex items-center gap-3 text-gray-700">
+                    <li class="flex items-center gap-3 text-gray-600">
                         <svg class="w-5 h-5 text-y2b-primary shrink-0" fill="currentColor" viewBox="0 0 512 512"><path d="M504 256C504 119 393 8 256 8S8 119 8 256s111 248 248 248 248-111 248-248zm-448 0c0-110.5 89.5-200 200-200s200 89.5 200 200-89.5 200-200 200S56 366.5 56 256zm72 20v-40c0-6.6 5.4-12 12-12h116v-67c0-10.7 12.9-16 20.5-8.5l99 99c4.7 4.7 4.7 12.3 0 17l-99 99c-7.6 7.6-20.5 2.2-20.5-8.5v-67H140c-6.6 0-12-5.4-12-12z"/></svg>
                         {{ $point }}
                     </li>
@@ -126,13 +140,17 @@
             <h2 class="text-xl text-gray-500 mt-2">Our Network of Trusted Partners</h2>
         </div>
 
-        <div class="flex flex-wrap justify-center gap-3 mb-12">
-            @foreach($locations as $location)
-                <a href="{{ route('properties.index', ['area' => strtolower($location)]) }}"
-                   class="inline-block bg-y2b-light text-y2b-primary border border-[#e2eaff] font-medium text-sm px-5 py-2 rounded-full hover:bg-y2b-primary hover:text-white hover:border-y2b-primary transition">
-                    {{ $location }}
-                </a>
-            @endforeach
+        <div class="locality-tabs-wrap relative mb-12 -mx-4 px-4 md:mx-0 md:px-0">
+            <div class="locality-tabs-fade locality-tabs-fade-left md:hidden" aria-hidden="true"></div>
+            <div class="locality-tabs-fade locality-tabs-fade-right md:hidden" aria-hidden="true"></div>
+            <div class="locality-tabs flex items-center gap-2 md:gap-3 overflow-x-auto pb-2 md:pb-0 md:flex-wrap md:justify-center md:overflow-visible scroll-smooth snap-x snap-mandatory md:snap-none">
+                @foreach($locations as $location)
+                    <a href="{{ route('properties.index', ['area' => strtolower($location)]) }}"
+                       class="shrink-0 snap-start whitespace-nowrap bg-y2b-light text-y2b-primary border border-[#e2eaff] font-medium text-xs sm:text-sm px-4 py-2 md:px-5 md:py-2 rounded-full hover:bg-y2b-primary hover:text-white hover:border-y2b-primary transition">
+                        {{ $location }}
+                    </a>
+                @endforeach
+            </div>
         </div>
 
         <div class="overflow-hidden">
@@ -197,7 +215,7 @@
                 @foreach($properties as $propertyItem)
                     <a href="{{ route('properties.show', $propertyItem['slug']) }}"
                        class="locality-property-link flex items-start gap-2.5 text-sm text-gray-700 hover:text-y2b-primary bg-white border border-gray-200 rounded-lg px-3 py-3 sm:px-4 sm:py-3 hover:border-y2b-primary hover:shadow-sm transition min-w-0">
-                        <svg class="w-4 h-4 text-y2b-accent shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 384 512"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"/></svg>
+                        <svg class="w-4 h-4 text-y2b-primary shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 384 512"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"/></svg>
                         <span class="line-clamp-2 leading-snug break-words">{{ $propertyItem['title'] }}</span>
                     </a>
                 @endforeach
@@ -232,13 +250,13 @@
                 <div class="grid sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm mb-1">Phone</label>
-                        <input type="tel" name="phone" required placeholder="Phone Number"
-                               class="w-full bg-white/10 border border-white/30 rounded px-4 py-2.5 text-white placeholder:text-blue-200 outline-none focus:border-white">
+                        <x-form-mobile-input name="phone" placeholder="Mobile Number"
+                               class="w-full bg-white/10 border border-white/30 rounded px-4 py-2.5 text-white placeholder:text-blue-200 outline-none focus:border-white" />
                     </div>
                     <div>
                         <label class="block text-sm mb-1">Email</label>
-                        <input type="email" name="email" required placeholder="Email"
-                               class="w-full bg-white/10 border border-white/30 rounded px-4 py-2.5 text-white placeholder:text-blue-200 outline-none focus:border-white">
+                        <x-form-email-input name="email" placeholder="Email"
+                               class="w-full bg-white/10 border border-white/30 rounded px-4 py-2.5 text-white placeholder:text-blue-200 outline-none focus:border-white" />
                     </div>
                 </div>
                 <div>
