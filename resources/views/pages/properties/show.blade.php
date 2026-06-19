@@ -80,23 +80,18 @@
                         <h2 class="text-xl sm:text-2xl font-bold text-y2b-primary mb-3 leading-snug break-words">{{ $property['title'] }}</h2>
 
                         <p class="text-gray-500 text-sm flex items-start gap-2 mb-5">
-                            <svg class="w-4 h-4 shrink-0 mt-0.5 text-y2b-accent" fill="currentColor" viewBox="0 0 384 512"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"/></svg>
+                            <svg class="w-4 h-4 shrink-0 mt-0.5 text-y2b-primary" fill="currentColor" viewBox="0 0 384 512"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"/></svg>
                             <span class="break-words">{{ $property['location'] }}</span>
                         </p>
 
                         <div class="mb-5">
                             <h3 class="text-sm font-bold text-y2b-primary uppercase tracking-wide mb-3">Features:</h3>
-                            <ul class="text-sm text-gray-600 space-y-2">
-                                <li class="flex items-center gap-2">
-                                    <span class="text-y2b-accent">🛏</span> {{ $property['bhk'] }}
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <span class="text-y2b-accent">📄</span> Project Area: {{ $property['area'] }}
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <span class="text-y2b-accent">📏</span> Possession Date: {{ $property['possession'] }}
-                                </li>
-                            </ul>
+                            <x-property-card-features
+                                :property="$property"
+                                detailed
+                                icon-class="w-4 h-4"
+                                class="text-sm text-gray-600 space-y-2"
+                            />
                         </div>
 
                         <p class="text-lg sm:text-xl font-bold text-y2b-primary mb-5 break-words">{{ $property['price'] }}</p>

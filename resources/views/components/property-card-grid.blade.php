@@ -15,11 +15,7 @@
             <svg class="w-3.5 h-3.5 shrink-0 mt-0.5 text-y2b-primary" fill="currentColor" viewBox="0 0 384 512"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"/></svg>
             {{ $property['location'] }}
         </p>
-        <ul class="text-xs text-gray-600 space-y-1 mb-4 flex-1">
-            <li>🛏 {{ $property['bhk'] }}</li>
-            <li>📄 Project Area: {{ $property['area'] }}</li>
-            <li>📏 {{ $property['possession'] }}</li>
-        </ul>
+        <x-property-card-features :property="$property" class="text-xs text-gray-600 mb-4 flex-1" />
         <div class="flex items-center justify-between gap-3 mt-auto pt-2 border-t border-gray-100">
             <p class="font-bold text-y2b-primary text-sm">{{ $property['price'] }}</p>
             <span class="text-sm font-semibold text-y2b-primary border border-y2b-primary px-4 py-1.5 rounded hover:bg-y2b-primary hover:text-white transition shrink-0">
