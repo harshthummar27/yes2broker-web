@@ -8,7 +8,7 @@ class HomePageData
     {
         return [
             [
-                'title' => 'test',
+                'title' => '₹1,00,000 Cashback',
                 'description' => 'Buy your new home through <strong>Yes2Broker</strong> and get an exclusive cashback when registering property under a <strong>woman\'s name</strong>.',
                 'icon' => 'home',
             ],
