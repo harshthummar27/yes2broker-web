@@ -10,7 +10,7 @@
     @stack('styles')
 </head>
 <body class="antialiased text-gray-800 bg-white">
-    @include('partials.flash-messages')
+    @include('partials.flash-messages') 
     @include('partials.header')
 
     <main>
