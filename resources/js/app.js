@@ -45,48 +45,30 @@ function initPropertyCarousel() {
     const carousel = document.getElementById('property-carousel');
     const prev = document.getElementById('carousel-prev');
     const next = document.getElementById('carousel-next');
-    const dots = document.querySelectorAll('[data-listing-carousel-dot]');
+    const dots = document.querySelectorAll('[data-trending-carousel-dot]');
 
     if (!carousel) return;
-
-    const cards = () => [...carousel.querySelectorAll('.property-card')];
 
     function isMobileView() {
         return window.matchMedia('(max-width: 767px)').matches;
     }
 
-    function getScrollStep() {
-        const card = carousel.querySelector('.property-card');
-        if (!card) {
-            return 340;
-        }
-
-        const gap = parseFloat(getComputedStyle(carousel).columnGap || getComputedStyle(carousel).gap) || 16;
-
-        return card.getBoundingClientRect().width + gap;
+    function getColumnWidth() {
+        return carousel.clientWidth || 1;
     }
 
-    function getMobileActiveIndex() {
-        const items = cards();
-        if (items.length === 0) {
-            return 0;
+    function getScrollStep() {
+        if (isMobileView()) {
+            return getColumnWidth();
         }
 
-        const scrollCenter = carousel.scrollLeft + carousel.clientWidth / 2;
-        let activeIndex = 0;
-        let minDistance = Infinity;
+        return carousel.clientWidth * 0.9;
+    }
 
-        items.forEach((card, index) => {
-            const cardCenter = card.offsetLeft + card.offsetWidth / 2;
-            const distance = Math.abs(cardCenter - scrollCenter);
+    function getActiveColumnIndex() {
+        const columnWidth = getColumnWidth();
 
-            if (distance < minDistance) {
-                minDistance = distance;
-                activeIndex = index;
-            }
-        });
-
-        return activeIndex;
+        return Math.round(carousel.scrollLeft / columnWidth);
     }
 
     function setActiveDot(activeIndex) {
@@ -96,24 +78,14 @@ function initPropertyCarousel() {
         });
     }
 
-    function scrollToIndex(index, behavior = 'smooth') {
-        const items = cards();
-        const card = items[index];
+    function scrollToColumn(index, behavior = 'smooth') {
+        const left = index * getColumnWidth();
 
-        if (!card) {
-            return;
-        }
-
-        card.scrollIntoView({ behavior, inline: 'center', block: 'nearest' });
+        carousel.scrollTo({ left, behavior });
         setActiveDot(index);
     }
 
     function scrollCarousel(direction) {
-        const items = cards();
-        if (items.length === 0) {
-            return;
-        }
-
         const step = getScrollStep();
         const maxScroll = Math.max(0, carousel.scrollWidth - carousel.clientWidth);
         const target = direction === 'next'
@@ -121,6 +93,10 @@ function initPropertyCarousel() {
             : Math.max(carousel.scrollLeft - step, 0);
 
         carousel.scrollTo({ left: target, behavior: 'smooth' });
+
+        if (isMobileView() && dots.length > 0) {
+            window.setTimeout(() => setActiveDot(getActiveColumnIndex()), 300);
+        }
     }
 
     if (dots.length > 0) {
@@ -132,13 +108,13 @@ function initPropertyCarousel() {
             }
 
             if (raf) cancelAnimationFrame(raf);
-            raf = requestAnimationFrame(() => setActiveDot(getMobileActiveIndex()));
+            raf = requestAnimationFrame(() => setActiveDot(getActiveColumnIndex()));
         }, { passive: true });
 
         dots.forEach((dot) => {
             dot.addEventListener('click', () => {
-                const index = parseInt(dot.dataset.listingCarouselDot || '0', 10);
-                scrollToIndex(index);
+                const index = parseInt(dot.dataset.trendingCarouselDot || '0', 10);
+                scrollToColumn(index);
             });
         });
     }
@@ -209,14 +185,15 @@ function initAccordion() {
 
 function initLoadMore() {
     const button = document.getElementById('load-more-properties');
-    const grid = document.getElementById('property-grid');
+    const list = document.getElementById('property-list');
 
-    if (!button || !grid) return;
+    if (!button || !list) return;
 
     button.addEventListener('click', async () => {
         const nextPage = parseInt(button.dataset.page, 10) + 1;
         const params = new URLSearchParams(window.location.search);
         params.set('page', String(nextPage));
+        params.set('start_index', button.dataset.startIndex || '0');
 
         const label = button.querySelector('.load-more-text');
         button.disabled = true;
@@ -230,8 +207,12 @@ function initLoadMore() {
             if (!response.ok) throw new Error('Failed to load properties');
 
             const data = await response.json();
-            grid.insertAdjacentHTML('beforeend', data.html);
+            list.insertAdjacentHTML('beforeend', data.html);
             button.dataset.page = String(data.page);
+
+            if (data.nextStartIndex !== undefined) {
+                button.dataset.startIndex = String(data.nextStartIndex);
+            }
 
             if (!data.hasMore) {
                 button.closest('.load-more-wrap')?.remove();

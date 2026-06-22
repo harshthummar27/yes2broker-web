@@ -27,6 +27,8 @@ class PropertyController extends Controller
             'totalCount' => $result['totalCount'],
             'propertyTypes' => HomePageData::propertyTypes(),
             'budgets' => HomePageData::budgets(),
+            'sortOptions' => HomePageData::sortOptions(),
+            'promoBanners' => $this->properties->listPromoBanners(),
         ]);
     }
 
@@ -45,12 +47,18 @@ class PropertyController extends Controller
     {
         $filters = $this->filtersFromRequest($request);
         $page = max(1, (int) $request->query('page', 2));
+        $startIndex = max(0, (int) $request->query('start_index', 0));
         $result = $this->properties->paginate($filters, $page);
 
         return response()->json([
-            'html' => view('partials.property-grid-items', ['properties' => $result['properties']])->render(),
+            'html' => view('partials.property-list-items', [
+                'properties' => $result['properties'],
+                'banners' => $this->properties->listPromoBanners(),
+                'startIndex' => $startIndex,
+            ])->render(),
             'page' => $result['currentPage'],
             'hasMore' => $result['hasMore'],
+            'nextStartIndex' => $startIndex + count($result['properties']),
         ]);
     }
 
@@ -61,6 +69,7 @@ class PropertyController extends Controller
             'area' => $request->query('area'),
             'type' => $request->query('type'),
             'budget' => $request->query('budget'),
-        ], fn ($value) => $value !== null && $value !== '');
+            'sort' => $request->query('sort'),
+        ], fn ($value) => $value !== null && $value !== '' && $value !== 'relevance');
     }
 }

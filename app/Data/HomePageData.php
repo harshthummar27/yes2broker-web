@@ -274,6 +274,16 @@ class HomePageData
         };
     }
 
+    public static function sortOptions(): array
+    {
+        return [
+            'relevance' => 'Relevance',
+            'price_asc' => 'Price: Low to High',
+            'price_desc' => 'Price: High to Low',
+            'newest' => 'Newest First',
+        ];
+    }
+
     public static function consultationOptions(): array
     {
         return [

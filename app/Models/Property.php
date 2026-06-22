@@ -251,17 +251,60 @@ class Property extends Model
 
     public function toCardArray(): array
     {
+        $overview = $this->overview ?? [];
+        $gallery = $this->galleryUrls();
+        $locationParts = array_map('trim', explode(',', $this->location));
+        $shortLocation = $locationParts[0] ?? $this->location;
+
         return [
             'slug' => $this->slug,
             'title' => $this->title,
             'location' => $this->location,
+            'short_location' => $shortLocation,
+            'city' => $this->city ?? 'Ahmedabad',
             'bhk' => $this->bhk,
             'area' => $this->area,
             'possession' => $this->possession,
             'price' => $this->price,
             'image' => $this->image_url,
+            'gallery_count' => max(count($gallery), 1),
             'is_new' => $this->is_new,
+            'is_trending' => $this->is_trending,
+            'rera_id' => $overview['rera_id'] ?? null,
+            'brochure_url' => $this->brochure_url,
+            'property_type_label' => $this->propertyTypeLabel(),
         ];
+    }
+
+    public function propertyTypeLabel(): string
+    {
+        $bhk = strtolower((string) $this->bhk);
+
+        if (str_contains($bhk, 'villa')) {
+            return 'Villa';
+        }
+
+        if (str_contains($bhk, 'bungalow')) {
+            return 'Bungalow';
+        }
+
+        if (str_contains($bhk, 'office') || str_contains($bhk, 'showroom') || str_contains($bhk, 'commercial')) {
+            return 'Commercial';
+        }
+
+        if (str_contains($bhk, 'plot') || str_contains($bhk, 'land')) {
+            return 'Plot';
+        }
+
+        if (str_contains($bhk, 'farmhouse')) {
+            return 'Farmhouse';
+        }
+
+        if (preg_match('/\d+\s*bhk/i', (string) $this->bhk)) {
+            return 'Flat';
+        }
+
+        return 'Property';
     }
 
     public function toDetailArray(): array

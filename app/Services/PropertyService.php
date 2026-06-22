@@ -159,10 +159,49 @@ class PropertyService
 
     private function baseQuery(array $filters = [])
     {
-        return Property::query()
+        $query = Property::query()
             ->active()
-            ->filtered($filters)
-            ->orderByDesc('is_trending')
-            ->orderBy('title');
+            ->filtered($filters);
+
+        return $this->applySort($query, $filters['sort'] ?? null);
+    }
+
+    private function applySort($query, ?string $sort)
+    {
+        return match ($sort) {
+            'price_asc' => $query->orderByRaw('CASE WHEN price_min_lakhs > 0 THEN price_min_lakhs ELSE 999999 END ASC'),
+            'price_desc' => $query->orderByDesc('price_min_lakhs'),
+            'newest' => $query->orderByDesc('updated_at'),
+            default => $query->orderByDesc('is_trending')->orderByDesc('is_new')->orderBy('title'),
+        };
+    }
+
+    /**
+     * @return array<int, array{title: string, location: string, image: string, slug: string, subtitle: string}>
+     */
+    public function listPromoBanners(int $limit = 6): array
+    {
+        $items = Property::query()
+            ->active()
+            ->where('is_trending', true)
+            ->orderByDesc('updated_at')
+            ->limit($limit)
+            ->get();
+
+        if ($items->isEmpty()) {
+            $items = Property::query()
+                ->active()
+                ->orderByDesc('updated_at')
+                ->limit($limit)
+                ->get();
+        }
+
+        return $items->map(fn (Property $property) => [
+            'title' => $property->title,
+            'location' => trim(explode(',', $property->location)[0] ?? $property->location),
+            'image' => $property->image_url,
+            'slug' => $property->slug,
+            'subtitle' => 'Discover premium properties at '.$property->title,
+        ])->all();
     }
 }

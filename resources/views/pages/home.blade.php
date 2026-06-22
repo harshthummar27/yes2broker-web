@@ -41,25 +41,27 @@
 </section>
 
 {{-- Trending Properties --}}
-<section class="py-14 overflow-x-hidden">
-    <div class="max-w-7xl mx-auto px-3 md:px-2">
-        <div class="text-center mb-10">
-            <h2 class="text-3xl font-bold text-y2b-primary">Our Listing</h2>
-            <h4 class="text-gray-500 mt-2">Trending Properties at Ahmedabad</h4>
+<section class="py-10 md:py-14 bg-white overflow-x-hidden">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex items-center justify-between gap-4 mb-6 md:mb-8">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-900">Our Listing</h2>
+            <a href="{{ route('properties.index') }}"
+               class="shrink-0 text-sm font-semibold text-y2b-primary border border-y2b-primary px-4 py-1.5 rounded-full hover:bg-y2b-primary hover:text-white transition">
+                See All
+            </a>
         </div>
 
-        <div class="property-carousel-wrap relative px-0 md:px-14">
+        <div class="trending-carousel-wrap relative">
             <button id="carousel-prev" type="button" aria-label="Previous"
-                    class="absolute left-1 md:left-0 top-1/2 -translate-y-1/2 z-20 w-9 h-9 md:w-10 md:h-10 bg-white shadow-lg rounded-full hidden md:flex items-center justify-center text-y2b-primary hover:bg-y2b-primary hover:text-white transition cursor-pointer">
+                    class="trending-carousel-arrow trending-carousel-arrow-prev hidden md:flex">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 1000 1000"><path d="M646 125C629 125 613 133 604 142L308 442C296 454 292 471 292 487 292 504 296 521 308 533L604 854C617 867 629 875 646 875 663 875 679 871 692 858 704 846 713 829 713 812 713 796 708 779 692 767L438 487 692 225C700 217 708 204 708 187 708 171 704 154 692 142 675 129 663 125 646 125Z"/></svg>
             </button>
 
-            <div id="property-carousel"
-                 class="property-carousel property-mobile-track relative z-0 flex max-md:gap-0 gap-4 md:gap-6 overflow-x-auto scroll-smooth pb-4 max-md:snap-x max-md:snap-mandatory">
+            <div id="property-carousel" class="trending-carousel property-mobile-track scroll-smooth">
                 @forelse($trendingProperties as $property)
-                    <x-property-card :property="$property" />
+                    <x-property-trending-card :property="$property" />
                 @empty
-                    <div class="w-full text-center py-12 text-gray-500">
+                    <div class="col-span-full w-full text-center py-12 text-gray-500">
                         <p>No properties available yet.</p>
                         <a href="{{ route('properties.index') }}" class="text-y2b-primary font-semibold hover:text-y2b-accent mt-2 inline-block">
                             Browse properties
@@ -69,30 +71,25 @@
             </div>
 
             <button id="carousel-next" type="button" aria-label="Next"
-                    class="absolute right-1 md:right-0 top-1/2 -translate-y-1/2 z-20 w-9 h-9 md:w-10 md:h-10 bg-white shadow-lg rounded-full hidden md:flex items-center justify-center text-y2b-primary hover:bg-y2b-primary hover:text-white transition cursor-pointer">
+                    class="trending-carousel-arrow trending-carousel-arrow-next hidden md:flex">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 1000 1000"><path d="M696 533C708 521 713 504 713 487 713 471 708 454 696 446L400 146C388 133 375 125 354 125 338 125 325 129 313 142 300 154 292 171 292 187 292 204 296 221 308 233L563 492 304 771C292 783 288 800 288 817 288 833 296 850 308 863 321 871 338 875 354 875 371 875 388 867 400 854L696 533Z"/></svg>
             </button>
 
-            @if(count($trendingProperties) > 1)
-                <div class="flex items-center justify-center gap-2 mt-3 md:hidden" data-listing-carousel-dots>
-                    @foreach($trendingProperties as $index => $property)
+            @if(count($trendingProperties) > 2)
+                <div class="flex md:hidden items-center justify-center gap-2 mt-4" data-trending-carousel-dots>
+                    @for($dot = 0; $dot < (int) ceil(count($trendingProperties) / 2); $dot++)
                         <button
                             type="button"
-                            class="w-2.5 h-2.5 rounded-full {{ $index === 0 ? 'bg-y2b-primary' : 'bg-gray-300' }}"
-                            aria-label="Go to property {{ $index + 1 }}"
-                            data-listing-carousel-dot="{{ $index }}"
+                            class="w-2.5 h-2.5 rounded-full transition {{ $dot === 0 ? 'bg-y2b-primary' : 'bg-gray-300' }}"
+                            aria-label="Go to slide {{ $dot + 1 }}"
+                            data-trending-carousel-dot="{{ $dot }}"
                         ></button>
-                    @endforeach
+                    @endfor
                 </div>
             @endif
         </div>
 
-        <div class="text-center mt-8">
-            <a href="{{ route('properties.index') }}"
-               class="inline-block bg-y2b-primary hover:bg-y2b-primary-dark text-white font-semibold px-8 py-3 rounded transition">
-                Load More Properties
-            </a>
-        </div>
+        <x-listing-dream-banner class="mt-8 md:mt-10" />
     </div>
 </section>
 
