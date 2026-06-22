@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Data\HomePageData;
 use App\Services\PropertyService;
+use App\Support\PossessionFilter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -28,6 +29,7 @@ class PropertyController extends Controller
             'propertyTypes' => HomePageData::propertyTypes(),
             'budgets' => HomePageData::budgets(),
             'sortOptions' => HomePageData::sortOptions(),
+            'possessionFilterOptions' => PossessionFilter::options(),
             'promoBanners' => $this->properties->listPromoBanners(),
         ]);
     }
@@ -69,7 +71,8 @@ class PropertyController extends Controller
             'area' => $request->query('area'),
             'type' => $request->query('type'),
             'budget' => $request->query('budget'),
+            'possession_filter' => $request->query('possession_filter'),
             'sort' => $request->query('sort'),
-        ], fn ($value) => $value !== null && $value !== '' && $value !== 'relevance');
+        ], fn ($value) => $value !== null && $value !== '' && ! in_array($value, ['relevance', 'all'], true));
     }
 }

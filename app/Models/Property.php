@@ -191,6 +191,10 @@ class Property extends Model
             }
         }
 
+        if (! empty($filters['possession_filter']) && $filters['possession_filter'] !== 'all') {
+            \App\Support\PossessionFilter::apply($query, $filters['possession_filter']);
+        }
+
         return $query;
     }
 

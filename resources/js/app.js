@@ -41,7 +41,7 @@ function initUspCarousel() {
             return 0;
         }
 
-        const slideWidth = carousel.clientWidth || slides[0].offsetWidth;
+        const slideWidth = carousel.clientWidth;
         if (slideWidth <= 0) {
             return 0;
         }

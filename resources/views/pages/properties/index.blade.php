@@ -28,19 +28,32 @@
                         </p>
                     </div>
 
-                    <form method="GET" action="{{ route('properties.index') }}" class="flex items-center gap-2 shrink-0">
+                    <form method="GET" action="{{ route('properties.index') }}" class="flex flex-wrap items-center gap-3 shrink-0">
                         @foreach($filters as $key => $value)
-                            @if($key !== 'sort')
+                            @if(! in_array($key, ['sort', 'possession_filter'], true))
                                 <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                             @endif
                         @endforeach
-                        <label for="sort" class="text-sm text-gray-500 whitespace-nowrap">Sort By:</label>
-                        <select id="sort" name="sort" onchange="this.form.submit()"
-                                class="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary">
-                            @foreach($sortOptions as $value => $label)
-                                <option value="{{ $value }}" @selected(($filters['sort'] ?? 'relevance') === $value)>{{ $label }}</option>
-                            @endforeach
-                        </select>
+
+                        <div class="flex items-center gap-2">
+                            <label for="possession_filter" class="text-sm text-gray-500 whitespace-nowrap">Filter by:</label>
+                            <select id="possession_filter" name="possession_filter" onchange="this.form.submit()"
+                                    class="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary">
+                                @foreach($possessionFilterOptions as $value => $label)
+                                    <option value="{{ $value }}" @selected(($filters['possession_filter'] ?? 'all') === $value)>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <label for="sort" class="text-sm text-gray-500 whitespace-nowrap">Sort By:</label>
+                            <select id="sort" name="sort" onchange="this.form.submit()"
+                                    class="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white outline-none focus:border-y2b-primary focus:ring-1 focus:ring-y2b-primary">
+                                @foreach($sortOptions as $value => $label)
+                                    <option value="{{ $value }}" @selected(($filters['sort'] ?? 'relevance') === $value)>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </form>
                 </div>
 

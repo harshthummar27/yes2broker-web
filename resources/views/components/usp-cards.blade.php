@@ -4,7 +4,9 @@
     <div class="max-w-7xl mx-auto px-4">
         <div id="usp-carousel" class="usp-carousel scroll-smooth">
             @foreach($usps as $usp)
-                <x-usp-card :usp="$usp" class="usp-carousel-item" />
+                <div class="usp-carousel-item">
+                    <x-usp-card :usp="$usp" class="h-full" />
+                </div>
             @endforeach
         </div>
 
