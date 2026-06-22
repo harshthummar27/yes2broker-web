@@ -21,14 +21,14 @@
 
         {{-- Logo panel --}}
         <div class="consultation-modal-brand hidden md:flex items-center justify-center p-8 md:p-10 rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none">
-            <img src="{{ config('site.popup_logo') }}" alt="{{ config('site.name') }}"
+            <img src="{{ site_asset(config('site.popup_logo')) }}" alt="{{ config('site.name') }}"
                  class="max-w-[280px] w-full h-auto">
         </div>
 
         {{-- Form panel --}}
         <div class="p-6 md:p-8">
             <div class="md:hidden flex justify-center mb-6">
-                <img src="{{ config('site.popup_logo') }}" alt="{{ config('site.name') }}" class="h-12 w-auto">
+                <img src="{{ site_asset(config('site.popup_logo')) }}" alt="{{ config('site.name') }}" class="h-12 w-auto">
             </div>
 
             <h2 id="consultation-modal-title" class="text-xl font-bold text-y2b-primary">Book Your Appointment</h2>

@@ -42,7 +42,7 @@
 <header class="bg-white shadow-sm sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
         <a href="{{ route('home') }}" class="shrink-0">
-            <img src="{{ config('site.logo') }}" alt="{{ config('site.name') }}" class="h-12 md:h-14 w-auto">
+            <img src="{{ site_asset(config('site.logo')) }}" alt="{{ config('site.name') }}" class="h-12 md:h-14 w-auto">
         </a>
 
         <nav class="hidden xl:flex items-center gap-6 text-sm font-medium text-gray-700">

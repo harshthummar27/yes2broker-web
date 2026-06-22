@@ -2,7 +2,7 @@
    {{ $attributes->merge(['class' => 'listing-dream-banner group block rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow']) }}>
     <div class="listing-dream-banner-inner relative flex items-center gap-4 md:gap-8 px-5 py-6 sm:px-8 sm:py-8 md:px-12 md:py-10">
         <div class="hidden sm:block shrink-0 w-28 md:w-36">
-            <img src="{{ config('site.list_property_image') }}" alt=""
+            <img src="{{ site_asset(config('site.list_property_image')) }}" alt=""
                  class="w-full h-auto object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300"
                  loading="lazy">
         </div>

@@ -16,6 +16,12 @@ class ImportWordPressPropertyCommand extends Command
 
     public function handle(WordPressPropertyImporter $importer): int
     {
+        if (! config('media-import.import_enabled', false)) {
+            $this->error('WordPress import is disabled. Set WORDPRESS_IMPORT_ENABLED=true in .env to use this command.');
+
+            return self::FAILURE;
+        }
+
         $slugs = $this->resolveSlugs();
 
         if ($slugs === []) {

@@ -13,7 +13,7 @@
             <p class="text-gray-600 leading-relaxed mb-8">
                 Navigating the real estate market can be overwhelming — that's where <strong>Yes2Broker</strong> steps in. Based in <strong>Ahmedabad</strong>, we offer more than just listings — we deliver tailored property solutions with speed, precision, and professionalism. Whether you're buying, selling, or investing, we combine market intelligence, personalized service, and end-to-end support to make every move smooth and rewarding.
             </p>
-            <img src="{{ config('site.channel_partner_image') }}" alt="Channel Partner"
+            <img src="{{ site_asset(config('site.channel_partner_image')) }}" alt="Channel Partner"
                  class="rounded-2xl shadow-lg w-full object-cover">
         </div>
 

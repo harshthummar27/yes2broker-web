@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Data\HomePageData;
 use App\Support\MapEmbed;
+use App\Support\PossessionFilter;
+use App\Support\SiteAsset;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -192,7 +194,7 @@ class Property extends Model
         }
 
         if (! empty($filters['possession_filter']) && $filters['possession_filter'] !== 'all') {
-            \App\Support\PossessionFilter::apply($query, $filters['possession_filter']);
+            PossessionFilter::apply($query, $filters['possession_filter']);
         }
 
         return $query;
@@ -229,10 +231,10 @@ class Property extends Model
     public static function resolveMediaUrl(?string $path): string
     {
         if (blank($path)) {
-            return config('site.media_url').'/2025/09/img63-scaled.jpg';
+            return SiteAsset::url((string) config('site.default_property_image'));
         }
 
-        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '//')) {
+        if (SiteAsset::isAbsoluteUrl($path)) {
             return $path;
         }
 

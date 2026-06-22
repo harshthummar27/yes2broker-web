@@ -13,6 +13,12 @@ class ImportLegacyPropertiesCommand extends Command
 
     public function handle(LegacyPropertyImporter $importer): int
     {
+        if (! config('media-import.import_enabled', false)) {
+            $this->error('WordPress import is disabled. Set WORDPRESS_IMPORT_ENABLED=true in .env to use this command.');
+
+            return self::FAILURE;
+        }
+
         $this->info('Importing properties from legacy WordPress export files...');
         $this->newLine();
         $this->line('Sources:');

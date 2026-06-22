@@ -2,6 +2,8 @@
 
 namespace App\Data;
 
+use App\Support\SiteAsset;
+
 class HomeLoanPageData
 {
     public static function howItWorks(): array
@@ -28,28 +30,26 @@ class HomeLoanPageData
 
     public static function bankPartners(): array
     {
-        $base = config('site.media_url');
-
         return [
             [
                 'name' => 'ICICI Bank',
                 'rate' => 'From 7.90% p.a.',
-                'logo' => "{$base}/2025/11/urygvhaedurfg-e1763190778158-300x85.png",
+                'logo' => SiteAsset::url('images/media/2025/11/icici-bank.png'),
             ],
             [
                 'name' => 'Union Bank of India',
                 'rate' => 'From 7.35% p.a.',
-                'logo' => "{$base}/2025/11/3-e1763189841237-300x71.png",
+                'logo' => SiteAsset::url('images/media/2025/11/union-bank.png'),
             ],
             [
                 'name' => 'Saraswat Bank',
                 'rate' => 'From 7.50% p.a.',
-                'logo' => "{$base}/2025/11/4-e1763189807220-300x111.png",
+                'logo' => SiteAsset::url('images/media/2025/11/saraswat-bank.png'),
             ],
             [
                 'name' => 'Bajaj Housing Finance',
                 'rate' => 'From 8.00% p.a.',
-                'logo' => "{$base}/2025/11/khfvbdzkfj-e1763189828278-300x99.png",
+                'logo' => SiteAsset::url('images/media/2025/11/bajaj-housing.png'),
             ],
         ];
     }

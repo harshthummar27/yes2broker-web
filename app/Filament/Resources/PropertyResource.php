@@ -78,7 +78,7 @@ class PropertyResource extends Resource
                             ->maxLength(255),
                     ]),
                 Forms\Components\Section::make('Media')
-                    ->description('Upload images or paste URLs from WordPress / external CDN.')
+                    ->description('Upload images or paste an external image URL.')
                     ->schema([
                         Forms\Components\FileUpload::make('image_upload')
                             ->label('Upload Featured Image')
@@ -91,7 +91,7 @@ class PropertyResource extends Resource
                         Forms\Components\TextInput::make('image')
                             ->label('Featured Image URL')
                             ->url()
-                            ->placeholder('https://yes2broker.in/wp-content/uploads/...')
+                            ->placeholder('https://example.com/image.jpg')
                             ->helperText('Used when no file is uploaded above.')
                             ->required(fn (Forms\Get $get): bool => blank($get('image_upload')))
                             ->columnSpanFull(),

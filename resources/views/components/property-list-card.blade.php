@@ -2,7 +2,7 @@
 
 @php
     $whatsappText = rawurlencode('Hi, I am interested in '.$property['title'].' listed on Yes2Broker.');
-    $whatsappUrl = 'https://wa.me/919512598980?text='.$whatsappText;
+    $whatsappUrl = config('site.whatsapp_href').'?text='.$whatsappText;
     $phoneHref = config('site.phone_href');
     $detailUrl = route('properties.show', $property['slug']);
     $hasRera = filled($property['rera_id'] ?? null) && ! str_contains(strtolower($property['rera_id']), 'request');

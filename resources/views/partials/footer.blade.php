@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 lg:grid-cols-4 gap-10">
         <div>
             <a href="{{ route('home') }}">
-                <img src="{{ config('site.logo_footer') }}" alt="{{ config('site.name') }}" class="h-12 mb-4">
+                <img src="{{ site_asset(config('site.logo_footer')) }}" alt="{{ config('site.name') }}" class="h-12 mb-4">
             </a>
             <p class="text-sm leading-relaxed text-gray-400">
                 We specialize in helping buyers, sellers, and investors find the best residential and commercial properties with expert advice, transparent service, and local market knowledge.

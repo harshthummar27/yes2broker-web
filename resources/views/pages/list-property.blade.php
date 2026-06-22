@@ -31,7 +31,7 @@
         </div>
 
         <div class="flex justify-center">
-            <img src="{{ config('site.list_property_image') }}" alt="List Your Property"
+            <img src="{{ site_asset(config('site.list_property_image')) }}" alt="List Your Property"
                  class="rounded-2xl shadow-lg max-w-md w-full">
         </div>
     </div>

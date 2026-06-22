@@ -16,7 +16,7 @@
         </div>
 
         <div class="grid md:grid-cols-2 gap-6 items-start">
-            <img src="{{ config('site.home_loan_image') }}" alt="Home Loan"
+            <img src="{{ site_asset(config('site.home_loan_image')) }}" alt="Home Loan"
                  class="rounded-2xl shadow-lg w-full object-cover h-full min-h-[200px]">
 
             <div class="bg-gray-50 rounded-2xl shadow-lg p-5 md:p-6">

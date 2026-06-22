@@ -88,15 +88,15 @@ class PropertyDetailData
         return [
             '108-yards' => [
                 'gallery' => [
-                    'https://yes2broker.in/wp-content/uploads/2025/10/img889.jpg',
-                    'https://yes2broker.in/wp-content/uploads/2025/10/img771.jpg',
-                    'https://yes2broker.in/wp-content/uploads/2025/10/img737.jpg',
-                    'https://yes2broker.in/wp-content/uploads/2025/10/img694.jpg',
-                    'https://yes2broker.in/wp-content/uploads/2025/10/img646.jpg',
-                    'https://yes2broker.in/wp-content/uploads/2025/10/img596.jpg',
-                    'https://yes2broker.in/wp-content/uploads/2025/10/img553.jpg',
-                    'https://yes2broker.in/wp-content/uploads/2025/10/img516.jpg',
-                    'https://yes2broker.in/wp-content/uploads/2025/10/img433.jpg',
+                    'properties/108-yards/img889.jpg',
+                    'properties/108-yards/img771.jpg',
+                    'properties/108-yards/img737.jpg',
+                    'properties/108-yards/img694.jpg',
+                    'properties/108-yards/img646.jpg',
+                    'properties/108-yards/img596.jpg',
+                    'properties/108-yards/img553.jpg',
+                    'properties/108-yards/img516.jpg',
+                    'properties/108-yards/img433.jpg',
                 ],
                 'description' => '108 Yards by 9Yards is an under-construction residential project strategically located on the SP Ring Road in Shilaj, Ahmedabad North West. Launched in October 2022 with an expected possession in October 2025, this development comprises 5 buildings and a total of 244 units of premium 3 BHK Apartments. The project is designed for both safety and luxury, featuring earthquake-resistant floors, granite kitchen platforms, and 24×7 surveillance. It provides a vibrant community lifestyle with amenities like a Gymnasium, Kid\'s Pool, Banquet Hall, and an Open Air Theatre. The project is RERA-registered, and the starting price for a 3 BHK apartment is ₹ 98.60 Lakhs Onwards',
                 'overview' => [
@@ -148,15 +148,7 @@ class PropertyDetailData
             ],
             'anand-paramount' => [
                 'gallery' => [
-                    'https://yes2broker.in/wp-content/uploads/2025/09/paramount-elevation-178981102.jpeg',
-                    'https://yes2broker.in/wp-content/uploads/2025/09/paramount-elevation-178981103.jpeg',
-                    'https://yes2broker.in/wp-content/uploads/2025/09/paramount-elevation-178981100.jpeg',
-                    'https://yes2broker.in/wp-content/uploads/2025/09/paramount-others-178981122.jpeg',
-                    'https://yes2broker.in/wp-content/uploads/2025/09/paramount-gymnasium-178981121.jpeg',
-                    'https://yes2broker.in/wp-content/uploads/2025/09/paramount-indoor-games-178981120.jpeg',
-                    'https://yes2broker.in/wp-content/uploads/2025/09/paramount-lift-s-178981119.jpeg',
-                    'https://yes2broker.in/wp-content/uploads/2025/09/paramount-others-178981118.jpeg',
-                    'https://yes2broker.in/wp-content/uploads/2025/09/paramount-others-178981117.jpeg',
+                    'properties/anand-paramount/paramount-elevation-178981100-1.webp',
                 ],
                 'description' => 'Anand Paramount by Anand Infinium is a luxury residential project located in Motera, Ahmedabad, just 5 minutes from Narendra Modi Stadium and metro connectivity. Spread across 1.43 acres, it offers 142 apartments in 3 towers with 3 and 4 BHK layouts. Sizes range from 277 sq. yd. to 385 sq. yd., priced between ₹1.44 Cr – ₹1.98 Cr. With possession due by December 2026, Anand Paramount features spacious layouts, large balconies, and a unique butterfly design, ensuring privacy and modern living.',
                 'overview' => [
@@ -219,12 +211,12 @@ class PropertyDetailData
                 'possession' => 'December 2029',
                 'price' => '₹82 Lakhs – ₹1.70 Cr',
                 'gallery' => [
-                    'https://yes2broker.in/wp-content/uploads/2025/10/elenza_gradient-shela-ahmedabad-elenza_green_projets_llp.avif',
-                    'https://yes2broker.in/wp-content/uploads/2025/10/1920_950.jpg',
-                    'https://yes2broker.in/wp-content/uploads/2025/10/fs-19.avif',
-                    'https://yes2broker.in/wp-content/uploads/2025/10/737_6881.jpg',
-                    'https://yes2broker.in/wp-content/uploads/2025/10/fs-2-11.avif',
-                    'https://yes2broker.in/wp-content/uploads/2025/10/fs-4-9.avif',
+                    'properties/elenza-gradient/elenza_gradient-shela-ahmedabad-elenza_green_projets_llp.avif',
+                    'properties/elenza-gradient/1920_950.jpg',
+                    'properties/elenza-gradient/fs-19.avif',
+                    'properties/elenza-gradient/737_6881.jpg',
+                    'properties/elenza-gradient/fs-2-11.avif',
+                    'properties/elenza-gradient/fs-4-9.avif',
                 ],
                 'description' => 'Elenza Gradient is a mixed-use project located on VIP Road, Bopal, offering both retail and residential spaces. The project includes a shop of 305 sq.ft., a 3 BHK residential unit (1725 sq.ft. priced at ₹82 L) and a 4 BHK (3500 sq.ft. priced at ₹1.70 Cr. Designed to cater to both investment and family needs, it aims to provide modern amenities and good connectivity in Bopal\'s growing neighborhood.',
                 'overview' => [

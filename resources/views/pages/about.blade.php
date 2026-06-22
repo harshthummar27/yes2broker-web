@@ -9,7 +9,7 @@
 <section class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
         <div class="flex justify-center">
-            <img src="{{ config('site.about_check_image') }}" alt="Yes2Broker"
+            <img src="{{ site_asset(config('site.about_check_image')) }}" alt="Yes2Broker"
                  class="rounded-2xl shadow-lg max-w-lg w-full">
         </div>
         <div>

@@ -6,7 +6,7 @@
 {{-- Hero with video + search --}}
 <section class="relative min-h-[480px] md:min-h-[560px] flex items-center overflow-hidden">
     <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover">
-        <source src="{{ config('site.hero_video') }}" type="video/mp4">
+        <source src="{{ site_asset(config('site.hero_video')) }}" type="video/mp4">
     </video>
     <div class="relative z-10 w-full max-w-6xl mx-auto px-4 py-16">
         <x-property-search
@@ -76,7 +76,7 @@
     <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
         <div class="flex justify-center">
             <div class="about-company-image-box rounded-2xl shadow-xl p-8 md:p-10 flex items-center justify-center w-full max-w-md min-h-[280px] md:min-h-[360px]">
-                <img src="{{ config('site.about_image') }}" alt="About Yes2Broker"
+                <img src="{{ site_asset(config('site.about_image')) }}" alt="About Yes2Broker"
                      class="w-full max-h-72 md:max-h-80 object-contain">
             </div>
         </div>
