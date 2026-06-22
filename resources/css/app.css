@@ -308,6 +308,39 @@
     border: 1px solid #e2eaff;
 }
 
+.usp-carousel {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+@media (max-width: 767px) {
+    .usp-carousel {
+        display: flex;
+        gap: 0;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-padding-inline: 0;
+        padding-inline: 0;
+        margin-inline: 0;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .usp-carousel::-webkit-scrollbar {
+        display: none;
+    }
+
+    .usp-carousel > .usp-carousel-item {
+        flex: 0 0 100%;
+        width: 100%;
+        min-width: 100%;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+    }
+}
+
 /* Form section */
 .consultation-section {
     background: linear-gradient(135deg, #001b73 0%, #003b88 100%);

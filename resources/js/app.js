@@ -3,6 +3,7 @@ import './bootstrap';
 document.addEventListener('DOMContentLoaded', () => {
     initMobileMenu();
     initFormValidation();
+    initUspCarousel();
     initPropertyCarousel();
     initFeaturedCarousel();
     initLocalityTabs();
@@ -16,6 +17,144 @@ document.addEventListener('DOMContentLoaded', () => {
     initPropertyInquiryModal();
     initHomeLoanBankModal();
 });
+
+function initUspCarousel() {
+    const carousel = document.getElementById('usp-carousel');
+    const dots = document.querySelectorAll('[data-usp-carousel-dot]');
+
+    if (!carousel) return;
+
+    const items = () => [...carousel.querySelectorAll('.usp-carousel-item')];
+    const AUTO_SLIDE_MS = 5000;
+    let currentIndex = 0;
+    let autoSlideTimer = null;
+    let resumeTimer = null;
+    let raf = null;
+
+    function isMobileView() {
+        return window.matchMedia('(max-width: 767px)').matches;
+    }
+
+    function getActiveIndex() {
+        const slides = items();
+        if (slides.length === 0) {
+            return 0;
+        }
+
+        const slideWidth = carousel.clientWidth || slides[0].offsetWidth;
+        if (slideWidth <= 0) {
+            return 0;
+        }
+
+        return Math.min(
+            slides.length - 1,
+            Math.round(carousel.scrollLeft / slideWidth),
+        );
+    }
+
+    function setActiveDot(activeIndex) {
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('bg-y2b-primary', index === activeIndex);
+            dot.classList.toggle('bg-gray-300', index !== activeIndex);
+        });
+    }
+
+    function scrollToIndex(index, behavior = 'smooth') {
+        const slide = items()[index];
+
+        if (!slide) {
+            return;
+        }
+
+        carousel.scrollTo({ left: slide.offsetLeft, behavior });
+        currentIndex = index;
+        setActiveDot(index);
+    }
+
+    function goToNextSlide() {
+        const slides = items();
+        if (slides.length <= 1) {
+            return;
+        }
+
+        scrollToIndex((currentIndex + 1) % slides.length);
+    }
+
+    function stopAutoSlide() {
+        if (autoSlideTimer) {
+            clearInterval(autoSlideTimer);
+            autoSlideTimer = null;
+        }
+
+        if (resumeTimer) {
+            clearTimeout(resumeTimer);
+            resumeTimer = null;
+        }
+    }
+
+    function startAutoSlide() {
+        stopAutoSlide();
+
+        if (!isMobileView() || items().length <= 1) {
+            return;
+        }
+
+        autoSlideTimer = setInterval(goToNextSlide, AUTO_SLIDE_MS);
+    }
+
+    function pauseAutoSlide(resumeAfterMs = AUTO_SLIDE_MS) {
+        stopAutoSlide();
+
+        if (!isMobileView() || items().length <= 1) {
+            return;
+        }
+
+        resumeTimer = setTimeout(startAutoSlide, resumeAfterMs);
+    }
+
+    carousel.addEventListener('scroll', () => {
+        if (!isMobileView()) {
+            return;
+        }
+
+        if (raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+            currentIndex = getActiveIndex();
+            setActiveDot(currentIndex);
+        });
+    }, { passive: true });
+
+    carousel.addEventListener('touchstart', () => pauseAutoSlide(), { passive: true });
+    carousel.addEventListener('touchend', () => pauseAutoSlide(AUTO_SLIDE_MS), { passive: true });
+
+    dots.forEach((dot) => {
+        dot.addEventListener('click', () => {
+            const index = parseInt(dot.dataset.uspCarouselDot || '0', 10);
+            scrollToIndex(index);
+            pauseAutoSlide(AUTO_SLIDE_MS);
+        });
+    });
+
+    window.addEventListener('resize', () => {
+        if (isMobileView()) {
+            startAutoSlide();
+        } else {
+            stopAutoSlide();
+        }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopAutoSlide();
+        } else if (isMobileView()) {
+            startAutoSlide();
+        }
+    });
+
+    if (dots.length > 0) {
+        startAutoSlide();
+    }
+}
 
 function initFormValidation() {
     document.querySelectorAll('input[type="tel"][name="phone"], input[type="tel"][name="mobile"], input[type="tel"][name="alternate_phone"]').forEach((input) => {
