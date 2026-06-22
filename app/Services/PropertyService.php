@@ -163,6 +163,10 @@ class PropertyService
             ->active()
             ->filtered($filters);
 
+        if (($filters['possession_filter'] ?? null) === 'near_possession') {
+            return $query;
+        }
+
         return $this->applySort($query, $filters['sort'] ?? null);
     }
 

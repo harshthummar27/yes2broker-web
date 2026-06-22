@@ -23,89 +23,61 @@ class PossessionFilter
     {
         return match ($filter) {
             'ready_to_move' => $query->whereRaw("LOWER(REPLACE(possession, ' ', '')) LIKE '%ready%'"),
-            'near_possession' => self::applyPatternGroup($query, self::nearPossessionPatterns()),
-            'under_construction' => $query->where(function (Builder $builder): void {
-                $builder
-                    ->whereRaw("LOWER(possession) LIKE '%under%construction%'")
-                    ->orWhereRaw("LOWER(possession) LIKE '%under-construction%'")
-                    ->orWhere(function (Builder $dated): void {
-                        $dated
-                            ->whereRaw("LOWER(REPLACE(possession, ' ', '')) NOT LIKE '%ready%'")
-                            ->where(function (Builder $patterns): void {
-                                self::applyPatternGroup($patterns, self::underConstructionPatterns());
-                            });
-                    });
-            }),
+            'near_possession' => self::applyNearPossession($query),
+            'under_construction' => self::applyUnderConstruction($query),
             default => $query,
         };
     }
 
-    /**
-     * @param  list<string>  $patterns
-     */
-    private static function applyPatternGroup(Builder $query, array $patterns): Builder
+    public static function possessionDateExpression(): string
     {
-        if ($patterns === []) {
-            return $query->whereRaw('0 = 1');
-        }
+        $normalized = "TRIM(REGEXP_REPLACE(REPLACE(possession, ',', ''), '[[:space:]]+', ' '))";
 
-        return $query->where(function (Builder $builder) use ($patterns): void {
-            foreach ($patterns as $pattern) {
-                $builder->orWhereRaw('LOWER(possession) LIKE ?', [$pattern]);
-            }
+        return "COALESCE(
+            STR_TO_DATE(CONCAT('1 ', {$normalized}), '%d %M %Y'),
+            STR_TO_DATE(CONCAT('1 ', {$normalized}), '%d %b %Y')
+        )";
+    }
+
+    public static function nearPossessionStart(): Carbon
+    {
+        return Carbon::now()->startOfMonth();
+    }
+
+    public static function nearPossessionEnd(): Carbon
+    {
+        return Carbon::now()->addYear()->endOfMonth();
+    }
+
+    private static function applyNearPossession(Builder $query): Builder
+    {
+        $dateExpr = self::possessionDateExpression();
+        $start = self::nearPossessionStart()->format('Y-m-d');
+        $end = self::nearPossessionEnd()->format('Y-m-d');
+
+        return $query
+            ->whereRaw("LOWER(REPLACE(possession, ' ', '')) NOT LIKE '%ready%'")
+            ->whereRaw("{$dateExpr} IS NOT NULL")
+            ->whereRaw("{$dateExpr} >= ?", [$start])
+            ->whereRaw("{$dateExpr} <= ?", [$end])
+            ->orderByRaw("{$dateExpr} ASC");
+    }
+
+    private static function applyUnderConstruction(Builder $query): Builder
+    {
+        $dateExpr = self::possessionDateExpression();
+        $afterNearPossession = self::nearPossessionEnd()->format('Y-m-d');
+
+        return $query->where(function (Builder $builder) use ($dateExpr, $afterNearPossession): void {
+            $builder
+                ->whereRaw("LOWER(possession) LIKE '%under%construction%'")
+                ->orWhereRaw("LOWER(possession) LIKE '%under-construction%'")
+                ->orWhere(function (Builder $dated) use ($dateExpr, $afterNearPossession): void {
+                    $dated
+                        ->whereRaw("LOWER(REPLACE(possession, ' ', '')) NOT LIKE '%ready%'")
+                        ->whereRaw("{$dateExpr} IS NOT NULL")
+                        ->whereRaw("{$dateExpr} > ?", [$afterNearPossession]);
+                });
         });
-    }
-
-    /**
-     * @return list<string>
-     */
-    private static function nearPossessionPatterns(): array
-    {
-        return self::monthYearPatterns(Carbon::now(), 12);
-    }
-
-    /**
-     * @return list<string>
-     */
-    private static function underConstructionPatterns(): array
-    {
-        $start = Carbon::now()->addMonths(13)->startOfMonth();
-        $end = Carbon::now()->addYears(8)->endOfYear();
-
-        return self::monthYearPatterns($start, (int) $start->diffInMonths($end));
-    }
-
-    /**
-     * @return list<string>
-     */
-    private static function monthYearPatterns(Carbon $start, int $months): array
-    {
-        $patterns = [];
-        $cursor = $start->copy()->startOfMonth();
-
-        for ($index = 0; $index < $months; $index++) {
-            $patterns = array_merge($patterns, self::patternsForMonth($cursor));
-            $cursor->addMonth();
-        }
-
-        return array_values(array_unique($patterns));
-    }
-
-    /**
-     * @return list<string>
-     */
-    private static function patternsForMonth(Carbon $date): array
-    {
-        $year = $date->format('Y');
-        $fullMonth = strtolower($date->format('F'));
-        $shortMonth = strtolower($date->format('M'));
-
-        return [
-            "%{$fullMonth} {$year}%",
-            "%{$fullMonth}, {$year}%",
-            "%{$shortMonth} {$year}%",
-            "%{$shortMonth}, {$year}%",
-            "%{$shortMonth},%{$year}%",
-        ];
     }
 }
