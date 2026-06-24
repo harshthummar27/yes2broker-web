@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Data\HomePageData;
+use App\Services\HomePromoService;
+use App\Services\LookupOptionService;
 use App\Services\PropertyService;
 use App\Support\PossessionFilter;
 use Illuminate\Http\JsonResponse;
@@ -12,13 +14,16 @@ use Illuminate\View\View;
 class PropertyController extends Controller
 {
     public function __construct(
-        private readonly PropertyService $properties
+        private readonly PropertyService $properties,
+        private readonly HomePromoService $homePromos,
+        private readonly LookupOptionService $lookupOptions,
     ) {}
 
     public function index(Request $request): View
     {
         $filters = $this->filtersFromRequest($request);
         $result = $this->properties->paginate($filters, 1);
+        $promoItems = $this->homePromos->forPropertiesList()->all();
 
         return view('pages.properties.index', [
             'properties' => $result['properties'],
@@ -26,11 +31,14 @@ class PropertyController extends Controller
             'currentPage' => $result['currentPage'],
             'totalPages' => $result['totalPages'],
             'totalCount' => $result['totalCount'],
-            'propertyTypes' => HomePageData::propertyTypes(),
+            'cities' => $this->lookupOptions->citiesForSearch(),
+            'defaultCity' => $this->lookupOptions->defaultCitySlug(),
+            'propertyTypes' => $this->lookupOptions->propertyTypesForSearch(),
             'budgets' => HomePageData::budgets(),
             'sortOptions' => HomePageData::sortOptions(),
             'possessionFilterOptions' => PossessionFilter::options(),
-            'promoBanners' => $this->properties->listPromoBanners(),
+            'promoItems' => $promoItems,
+            'hasFormPromoBanner' => $this->homePromos->hasFormBanner($promoItems),
         ]);
     }
 
@@ -52,10 +60,12 @@ class PropertyController extends Controller
         $startIndex = max(0, (int) $request->query('start_index', 0));
         $result = $this->properties->paginate($filters, $page);
 
+        $promoItems = $this->homePromos->forPropertiesList()->all();
+
         return response()->json([
             'html' => view('partials.property-list-items', [
                 'properties' => $result['properties'],
-                'banners' => $this->properties->listPromoBanners(),
+                'promos' => $promoItems,
                 'startIndex' => $startIndex,
             ])->render(),
             'page' => $result['currentPage'],

@@ -1,7 +1,7 @@
-@props(['propertyTypes' => [], 'budgets' => [], 'selected' => []])
+@props(['cities' => [], 'propertyTypes' => [], 'budgets' => [], 'selected' => [], 'defaultCity' => 'ahmedabad'])
 
 @php
-    $selectedCity = $selected['city'] ?? request('city', 'ahmedabad');
+    $selectedCity = $selected['city'] ?? request('city', $defaultCity);
     $selectedArea = $selected['area'] ?? request('area', '');
     $selectedType = $selected['type'] ?? request('type', '');
     $selectedBudget = $selected['budget'] ?? request('budget', '');
@@ -14,8 +14,9 @@
         <label for="city" class="property-search-label">City</label>
         <div class="property-search-control">
             <select name="city" id="city" class="property-search-input property-search-select">
-                <option value="ahmedabad" @selected($selectedCity === 'ahmedabad')>Ahmedabad</option>
-                <option value="gandhinagar" @selected($selectedCity === 'gandhinagar')>Gandhinagar</option>
+                @foreach($cities as $value => $label)
+                    <option value="{{ $value }}" @selected($selectedCity === $value)>{{ $label }}</option>
+                @endforeach
             </select>
             <svg class="property-search-chevron" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>

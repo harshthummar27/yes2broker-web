@@ -445,6 +445,10 @@ body.consultation-modal-open {
     display: flex;
 }
 
+#banner-promo-modal.is-open {
+    display: flex;
+}
+
 /* Homepage locality tabs — mobile horizontal scroll */
 .locality-tabs {
     -ms-overflow-style: none;

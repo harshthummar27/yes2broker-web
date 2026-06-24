@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PropertyResource\Pages;
 use App\Models\Property;
+use App\Services\LookupOptionService;
 use App\Support\MapEmbed;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -67,15 +68,14 @@ class PropertyResource extends Resource
                             ->required()
                             ->maxLength(255),
                         Forms\Components\Select::make('city')
-                            ->options([
-                                'Ahmedabad' => 'Ahmedabad',
-                                'Gandhinagar' => 'Gandhinagar',
-                            ])
-                            ->default('Ahmedabad'),
-                        Forms\Components\TextInput::make('property_type')
+                            ->options(fn (): array => app(LookupOptionService::class)->citiesForAdmin())
+                            ->default(fn (): ?string => array_key_first(app(LookupOptionService::class)->citiesForAdmin()))
+                            ->searchable(),
+                        Forms\Components\Select::make('property_type')
                             ->label('Property Type')
-                            ->placeholder('Apartment, Villa, Plot, etc.')
-                            ->maxLength(255),
+                            ->options(fn (): array => app(LookupOptionService::class)->propertyTypesForAdmin())
+                            ->searchable()
+                            ->native(false),
                     ]),
                 Forms\Components\Section::make('Media')
                     ->description('Upload images or paste an external image URL.')
@@ -231,6 +231,9 @@ class PropertyResource extends Resource
                 Tables\Columns\TextColumn::make('city')
                     ->badge()
                     ->toggleable(),
+                Tables\Columns\TextColumn::make('property_type')
+                    ->label('Type')
+                    ->toggleable(),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Published')
                     ->boolean(),
@@ -252,10 +255,10 @@ class PropertyResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label('Published'),
                 Tables\Filters\SelectFilter::make('city')
-                    ->options([
-                        'Ahmedabad' => 'Ahmedabad',
-                        'Gandhinagar' => 'Gandhinagar',
-                    ]),
+                    ->options(fn (): array => app(LookupOptionService::class)->citiesForAdmin()),
+                Tables\Filters\SelectFilter::make('property_type')
+                    ->label('Type')
+                    ->options(fn (): array => app(LookupOptionService::class)->propertyTypesForAdmin()),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -151,14 +151,14 @@ class Property extends Model
         $filters = array_filter($filters, fn ($value) => $value !== null && $value !== '');
 
         if (! empty($filters['city'])) {
-            $city = strtolower($filters['city']);
-            $query->where(function (Builder $builder) use ($city): void {
-                if ($city === 'gandhinagar') {
-                    $builder->whereRaw('LOWER(location) LIKE ?', ['%gandhinagar%']);
-                } else {
-                    $builder->whereRaw('LOWER(location) NOT LIKE ?', ['%gandhinagar%']);
-                }
-            });
+            $city = City::query()
+                ->active()
+                ->where('slug', strtolower((string) $filters['city']))
+                ->first();
+
+            if ($city !== null) {
+                $query->whereRaw('LOWER(city) = ?', [strtolower($city->name)]);
+            }
         }
 
         if (! empty($filters['area'])) {
@@ -170,17 +170,12 @@ class Property extends Model
         }
 
         if (! empty($filters['type'])) {
-            $typeMap = [
-                'apartment' => 'bhk',
-                'villa' => 'villa',
-                'bungalow' => 'bungalow',
-                'office' => 'office',
-                'showroom' => 'showroom',
-                'shop' => 'shop',
-                'farmhouse' => 'farmhouse',
-                'land' => 'plot',
-            ];
-            $needle = $typeMap[$filters['type']] ?? $filters['type'];
+            $propertyType = PropertyType::query()
+                ->active()
+                ->where('slug', (string) $filters['type'])
+                ->first();
+
+            $needle = $propertyType?->filter_keyword ?? (string) $filters['type'];
             $query->whereRaw('LOWER(bhk) LIKE ?', ['%'.strtolower($needle).'%']);
         }
 
@@ -284,6 +279,10 @@ class Property extends Model
 
     public function propertyTypeLabel(): string
     {
+        if (filled($this->property_type)) {
+            return (string) $this->property_type;
+        }
+
         $bhk = strtolower((string) $this->bhk);
 
         if (str_contains($bhk, 'villa')) {

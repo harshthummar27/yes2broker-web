@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreBannerPromoRequest;
 use App\Http\Requests\StoreChannelPartnerRequest;
 use App\Http\Requests\StoreConsultationRequest;
 use App\Http\Requests\StoreHomeLoanRequest;
@@ -19,6 +20,17 @@ class EnquiryController extends Controller
     public function __construct(
         private readonly EnquiryDispatcher $enquiryDispatcher,
     ) {}
+
+    public function bannerPromo(StoreBannerPromoRequest $request): RedirectResponse
+    {
+        $validated = $request->validated();
+
+        return $this->send(
+            'Homepage Banner Enquiry',
+            $validated,
+            'Thank you! Your details have been submitted successfully.'
+        );
+    }
 
     public function consultation(StoreConsultationRequest $request): RedirectResponse
     {

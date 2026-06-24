@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initPropertyFaq();
     initPropertyInquiryModal();
     initHomeLoanBankModal();
+    initBannerPromoModal();
 });
 
 function initUspCarousel() {
@@ -659,6 +660,51 @@ function initHomeLoanBankModal() {
             event.preventDefault();
             openModal(trigger.dataset.bankName || '');
         });
+    });
+
+    closeBtn?.addEventListener('click', closeModal);
+    backdrop?.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+            closeModal();
+        }
+    });
+}
+
+function initBannerPromoModal() {
+    const modal = document.getElementById('banner-promo-modal');
+    const backdrop = document.getElementById('banner-promo-modal-backdrop');
+    const closeBtn = document.getElementById('banner-promo-modal-close');
+    const titleEl = document.getElementById('banner-promo-modal-title');
+    const promoIdInput = document.getElementById('banner-promo-id');
+    const sourceInput = document.getElementById('banner-promo-source');
+    const triggers = document.querySelectorAll('[data-open-banner-promo]');
+
+    if (!modal) return;
+
+    function openModal(trigger) {
+        const title = trigger.dataset.formTitle || 'Get in Touch';
+        const promoId = trigger.dataset.promoId || '';
+
+        if (titleEl) titleEl.textContent = title;
+        if (promoIdInput) promoIdInput.value = promoId;
+        if (sourceInput) sourceInput.value = promoId ? `Homepage Banner #${promoId}` : 'Homepage Banner';
+
+        modal.classList.add('is-open');
+        modal.classList.remove('hidden');
+        document.body.classList.add('consultation-modal-open');
+        document.getElementById('banner_promo_name')?.focus();
+    }
+
+    function closeModal() {
+        modal.classList.remove('is-open');
+        modal.classList.add('hidden');
+        document.body.classList.remove('consultation-modal-open');
+    }
+
+    triggers.forEach((trigger) => {
+        trigger.addEventListener('click', () => openModal(trigger));
     });
 
     closeBtn?.addEventListener('click', closeModal);

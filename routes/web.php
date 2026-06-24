@@ -27,6 +27,7 @@ Route::get('/list-your-property', [ListPropertyController::class, 'index'])->nam
 Route::get('/become-channel-partner', [ChannelPartnerController::class, 'index'])->name('channel-partner');
 Route::get('/home-loan', [HomeLoanController::class, 'index'])->name('home-loan');
 
+Route::post('/enquiry/banner-promo', [EnquiryController::class, 'bannerPromo'])->name('enquiry.banner-promo');
 Route::post('/enquiry/consultation', [EnquiryController::class, 'consultation'])->name('enquiry.consultation');
 Route::post('/enquiry/newsletter', [EnquiryController::class, 'newsletter'])->name('enquiry.newsletter');
 Route::post('/enquiry/channel-partner', [EnquiryController::class, 'channelPartner'])->name('enquiry.channel-partner');

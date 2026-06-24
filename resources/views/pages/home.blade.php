@@ -10,8 +10,10 @@
     </video>
     <div class="relative z-10 w-full max-w-6xl mx-auto px-4 py-16">
         <x-property-search
+            :cities="$cities"
             :property-types="$propertyTypes"
-            :budgets="$budgets" />
+            :budgets="$budgets"
+            :default-city="$defaultCity" />
     </div>
 </section>
 
@@ -67,7 +69,10 @@
             @endif
         </div>
 
-        <x-listing-dream-banner class="mt-8 md:mt-10" />
+        <x-listing-dream-banner class="mt-8 md:mt-10" :items="$dreamPromoItems" />
+        @if($hasFormPromoBanner ?? false)
+            <x-banner-promo-modal />
+        @endif
     </div>
 </section>
 

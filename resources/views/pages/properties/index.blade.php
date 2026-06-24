@@ -7,8 +7,10 @@
 <section class="bg-y2b-primary py-6 md:py-8">
     <div class="max-w-7xl mx-auto px-4">
         <x-property-search
+            :cities="$cities"
             :property-types="$propertyTypes"
             :budgets="$budgets"
+            :default-city="$defaultCity"
             :selected="$filters" />
     </div>
 </section>
@@ -72,7 +74,7 @@
                     @if($totalCount > 0)
                         @include('partials.property-list-items', [
                             'properties' => $properties,
-                            'banners' => $promoBanners,
+                            'promos' => $promoItems,
                             'startIndex' => 0,
                         ])
                     @endif
@@ -114,4 +116,8 @@
         </div>
     </div>
 </section>
+
+@if($hasFormPromoBanner ?? false)
+    <x-banner-promo-modal />
+@endif
 @endsection
