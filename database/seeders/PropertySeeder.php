@@ -58,7 +58,7 @@ class PropertySeeder extends Seeder
                     'street_view_embed_url' => $detail['street_view_embed_url'] ?? null,
                     'brochure_url' => $detail['brochure_url'] ?? null,
                     'city' => str_contains(strtolower($detail['location']), 'gandhinagar') ? 'Gandhinagar' : 'Ahmedabad',
-                    'is_new' => $detail['is_new'] ?? true,
+                    'is_new' => false,
                     'is_trending' => in_array($detail['slug'], self::TRENDING_SLUGS, true),
                     'is_active' => true,
                 ]

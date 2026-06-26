@@ -73,7 +73,7 @@ class PropertyDetailData
             'map_embed_url' => self::mapEmbedUrl($listing['location']),
             'street_view_embed_url' => null,
             'brochure_url' => null,
-            'is_new' => true,
+            'is_new' => false,
         ], $overrides);
 
         if (empty($detail['gallery'])) {

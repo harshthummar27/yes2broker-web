@@ -5,7 +5,7 @@
     <div class="relative overflow-hidden aspect-[16/9] bg-gray-100 md:aspect-auto md:h-52">
         <img src="{{ $property['image'] }}" alt="{{ $property['title'] }}"
              class="property-card-image w-full h-full object-cover object-center" loading="lazy">
-        @if($property['is_new'] ?? true)
+        @if($property['is_new'] ?? false)
             <span class="absolute top-3 right-3 bg-y2b-primary text-white text-xs font-bold px-3 py-1 rounded">New</span>
         @endif
     </div>

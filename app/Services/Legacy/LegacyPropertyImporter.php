@@ -167,7 +167,7 @@ class LegacyPropertyImporter
                         'brochure_url' => $parsed['brochure_url'] ?? null,
                         'city' => $this->resolveCity($location ?? (string) ($base->city ?? '')),
                         'property_type' => $base->property_type ?: 'Apartment',
-                        'is_new' => (bool) ($base->is_new ?? true),
+                        'is_new' => false,
                         'is_trending' => in_array($slug, self::TRENDING_SLUGS, true),
                         'is_active' => (bool) ($base->is_active ?? true),
                     ]

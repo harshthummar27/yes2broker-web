@@ -201,7 +201,8 @@ class PropertyResource extends Resource
                             ->label('Published')
                             ->default(true),
                         Forms\Components\Toggle::make('is_new')
-                            ->label('Show New Badge')
+                            ->label('Show New Project badge')
+                            ->helperText('Enable only for newly added listings.')
                             ->default(true),
                         Forms\Components\Toggle::make('is_trending')
                             ->label('Trending on Homepage')
