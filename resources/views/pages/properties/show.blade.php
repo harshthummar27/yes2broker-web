@@ -315,6 +315,17 @@
 @endif
 
 @push('scripts')
+    @if(session('trigger_brochure_download') === $property['slug'] && filled($property['brochure_url'] ?? null))
+        <script>
+            window.addEventListener('DOMContentLoaded', function () {
+                var iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = @json(route('properties.brochure', $property['slug']));
+                document.body.appendChild(iframe);
+            });
+        </script>
+    @endif
+
     @if(request()->boolean('brochure') && filled($property['brochure_url'] ?? null))
         <script>
             window.addEventListener('DOMContentLoaded', function () {

@@ -130,7 +130,14 @@ class EnquiryController extends Controller
             if ($property !== null && filled($property->brochure_url)) {
                 $request->session()->put("brochure_access.{$property->slug}", true);
 
-                return redirect()->route('properties.brochure', $property->slug);
+                $successMessage = $mailFailed
+                    ? 'Thank you! Your brochure download has started. (We could not send the notification email.)'
+                    : 'Thank you! Your brochure download has started successfully.';
+
+                return redirect()
+                    ->route('properties.show', $property->slug)
+                    ->with('success', $successMessage)
+                    ->with('trigger_brochure_download', $property->slug);
             }
 
             return redirect()
