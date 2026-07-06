@@ -3,14 +3,21 @@
 namespace App\Models;
 
 use App\Data\HomePageData;
+use App\Support\AmenityIcon;
+use App\Support\IndianPrice;
 use App\Support\MapEmbed;
 use App\Support\PossessionFilter;
+use App\Support\ProjectAreaUnit;
+use App\Support\PropertyOverview;
+use App\Support\PropertyUnitConfiguration;
 use App\Support\SiteAsset;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class Property extends Model
 {
@@ -18,10 +25,18 @@ class Property extends Model
         'slug',
         'title',
         'location',
+        'address_line_1',
+        'address_line_2',
+        'locality',
         'bhk',
         'area',
+        'project_area_value',
+        'project_area_unit',
         'possession',
+        'possession_date',
         'price',
+        'price_min_amount',
+        'price_max_amount',
         'price_min_lakhs',
         'image',
         'gallery',
@@ -31,8 +46,10 @@ class Property extends Model
         'faqs',
         'map_embed_url',
         'street_view_embed_url',
+        'show_street_view',
         'brochure_url',
         'city',
+        'state',
         'property_type',
         'is_new',
         'is_trending',
@@ -47,6 +64,11 @@ class Property extends Model
             'amenities' => 'array',
             'faqs' => 'array',
             'price_min_lakhs' => 'decimal:2',
+            'project_area_value' => 'decimal:4',
+            'possession_date' => 'date',
+            'price_min_amount' => 'integer',
+            'price_max_amount' => 'integer',
+            'show_street_view' => 'boolean',
             'is_new' => 'boolean',
             'is_trending' => 'boolean',
             'is_active' => 'boolean',
@@ -60,22 +82,65 @@ class Property extends Model
                 $property->slug = Str::slug($property->title);
             }
 
-            if (filled($property->price)) {
+            if (filled($property->price_min_amount)) {
+                $property->price = IndianPrice::formatRange(
+                    $property->price_min_amount,
+                    $property->price_max_amount
+                );
+                $property->price_min_lakhs = IndianPrice::toMinLakhs($property->price_min_amount);
+            } elseif (filled($property->price)) {
                 $property->price_min_lakhs = self::parsePriceMinLakhs($property->price);
             }
 
+            if (filled($property->possession_date) && ! self::isReadyToMove($property->possession)) {
+                $property->possession = Carbon::parse($property->possession_date)->format('F Y');
+            }
+
             if (blank($property->city)) {
-                $property->city = str_contains(strtolower($property->location), 'gandhinagar')
-                    ? 'Gandhinagar'
-                    : 'Ahmedabad';
+                $property->city = app(\App\Services\LookupOptionService::class)->defaultCityName();
             }
 
-            if (blank($property->map_embed_url) && filled($property->location)) {
-                $property->map_embed_url = MapEmbed::mapUrl($property->location);
+            if (blank($property->state)) {
+                $property->state = app(\App\Services\LookupOptionService::class)->defaultStateName();
             }
 
-            if (blank($property->street_view_embed_url) && filled($property->location)) {
-                $property->street_view_embed_url = MapEmbed::streetViewUrl($property->location);
+            if (filled($property->address_line_1)) {
+                $property->location = self::composeLocation(
+                    $property->address_line_1,
+                    $property->address_line_2,
+                    $property->locality,
+                    $property->city,
+                    $property->state,
+                );
+            }
+
+            if (blank($property->project_area_unit)) {
+                $property->project_area_unit = app(\App\Services\LookupOptionService::class)->defaultProjectUnitName();
+            }
+
+            if (filled($property->project_area_value) && filled($property->project_area_unit)) {
+                $property->area = self::formatProjectArea(
+                    $property->project_area_value,
+                    $property->project_area_unit
+                );
+            }
+
+            $property->syncOverviewFromListingFields();
+
+            $locationForMaps = $property->displayLocation();
+
+            if (blank($property->map_embed_url) && filled($locationForMaps)) {
+                $property->map_embed_url = MapEmbed::mapUrl($locationForMaps);
+            }
+
+            if ($property->show_street_view === null) {
+                $property->show_street_view = true;
+            }
+
+            if (! $property->show_street_view) {
+                $property->street_view_embed_url = null;
+            } elseif (blank($property->street_view_embed_url) && filled($locationForMaps)) {
+                $property->street_view_embed_url = MapEmbed::streetViewUrl($locationForMaps);
             }
 
             if (empty($property->gallery) && filled($property->image)) {
@@ -84,6 +149,26 @@ class Property extends Model
 
             $property->fillDefaultDetailFields();
         });
+
+        static::saved(function (Property $property): void {
+            app(\App\Services\PropertyListingUnitService::class)->syncPropertyFromOverviewJson($property);
+        });
+    }
+
+    /**
+     * @return HasMany<PropertyListingUnit, $this>
+     */
+    public function listingUnits(): HasMany
+    {
+        return $this->hasMany(PropertyListingUnit::class)->orderBy('sort_order');
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function unitConfigurationItems(): array
+    {
+        return app(\App\Services\PropertyListingUnitService::class)->normalizedListForProperty($this);
     }
 
     public function fillDefaultDetailFields(): void
@@ -92,7 +177,7 @@ class Property extends Model
             $this->description = sprintf(
                 '%s is a premium real estate project located at %s. Offering %s across %s, with possession expected by %s and prices starting at %s.',
                 $this->title,
-                rtrim((string) $this->location, '.'),
+                rtrim($this->displayLocation(), '.'),
                 $this->bhk,
                 $this->area,
                 $this->possession,
@@ -112,22 +197,11 @@ class Property extends Model
             ];
         }
 
-        if (empty($this->amenities) && ! $this->exists) {
-            $this->amenities = [
-                'Gymnasium',
-                'Children\'s Play Area',
-                '24×7 Security',
-                'Power Backup',
-                'Landscaped Gardens',
-                'Parking',
-            ];
-        }
-
         if (empty($this->faqs) && ! $this->exists) {
             $this->faqs = [
                 [
                     'question' => 'Where is '.$this->title.' located?',
-                    'answer' => $this->location,
+                    'answer' => $this->displayLocation(),
                 ],
                 [
                     'question' => 'What is the price range?',
@@ -139,6 +213,81 @@ class Property extends Model
                 ],
             ];
         }
+    }
+
+    public function syncOverviewFromListingFields(): void
+    {
+        $this->overview = PropertyOverview::buildPayload([
+            'area' => $this->area,
+            'bhk' => $this->displayBhk(),
+            'price' => $this->price,
+            'possession' => $this->possession,
+            'overview' => $this->overview ?? [],
+        ]);
+
+        $unitConfigurations = $this->unitConfigurationItems();
+
+        if ($unitConfigurations !== []) {
+            $composed = PropertyUnitConfiguration::composeBhkLabel($unitConfigurations);
+
+            if (filled($composed)) {
+                $this->bhk = $composed;
+            }
+        }
+    }
+
+    public static function formatProjectArea(float|string|null $value, ?string $unit): string
+    {
+        if ($value === null || $value === '' || blank($unit)) {
+            return '';
+        }
+
+        $numeric = (float) $value;
+        $formatted = ProjectAreaUnit::formatValue($numeric);
+
+        return $formatted.' '.$unit;
+    }
+
+    /**
+     * @return array{value: ?string, unit: ?string}
+     */
+    public static function parseProjectArea(?string $area): array
+    {
+        if (blank($area)) {
+            return ['value' => null, 'unit' => null];
+        }
+
+        if (preg_match('/^([\d.]+)\s+(.+)$/u', trim($area), $matches) !== 1) {
+            return ['value' => null, 'unit' => null];
+        }
+
+        return [
+            'value' => $matches[1],
+            'unit' => trim($matches[2]),
+        ];
+    }
+
+    /**
+     * @return list<array{name: string, icon: string}>
+     */
+    public function amenityItems(): array
+    {
+        $items = [];
+
+        foreach ($this->amenities ?? [] as $amenity) {
+            $name = is_string($amenity) ? $amenity : ($amenity['name'] ?? '');
+
+            if (blank($name)) {
+                continue;
+            }
+
+            $items[] = [
+                'name' => $name,
+                'icon' => AmenityIcon::resolve($name),
+            ];
+        }
+
+        return $items;
     }
 
     public function scopeActive(Builder $query): Builder
@@ -214,9 +363,42 @@ class Property extends Model
         );
     }
 
+    public function displayLocation(): string
+    {
+        if (filled($this->address_line_1)) {
+            return self::composeLocation(
+                $this->address_line_1,
+                $this->address_line_2,
+                $this->locality,
+                $this->city,
+                $this->state,
+            );
+        }
+
+        return (string) ($this->location ?? '');
+    }
+
+    public static function composeLocation(
+        ?string $addressLine1,
+        ?string $addressLine2 = null,
+        ?string $locality = null,
+        ?string $city = null,
+        ?string $state = null,
+    ): string {
+        return implode(', ', array_filter([
+            filled($addressLine1) ? trim($addressLine1) : null,
+            filled($addressLine2) ? trim($addressLine2) : null,
+            filled($locality) ? trim($locality) : null,
+            filled($city) ? trim($city) : null,
+            filled($state) ? trim($state) : null,
+        ]));
+    }
+
     public function postcode(): string
     {
-        if (preg_match('/\b(\d{6})\b/', $this->location, $matches)) {
+        $location = $this->displayLocation();
+
+        if (preg_match('/\b(\d{6})\b/', $location, $matches)) {
             return $matches[1];
         }
 
@@ -250,20 +432,37 @@ class Property extends Model
         ));
     }
 
+    public function displayBhk(): string
+    {
+        $unitConfigurations = $this->unitConfigurationItems();
+
+        if ($unitConfigurations !== []) {
+            $composed = PropertyUnitConfiguration::composeBhkLabel($unitConfigurations);
+
+            if (filled($composed)) {
+                return $composed;
+            }
+        }
+
+        return (string) ($this->bhk ?? '');
+    }
+
     public function toCardArray(): array
     {
         $overview = $this->overview ?? [];
         $gallery = $this->galleryUrls();
-        $locationParts = array_map('trim', explode(',', $this->location));
-        $shortLocation = $locationParts[0] ?? $this->location;
+        $locationParts = array_map('trim', explode(',', $this->displayLocation()));
+        $shortLocation = filled($this->locality)
+            ? $this->locality
+            : ($locationParts[0] ?? $this->displayLocation());
 
         return [
             'slug' => $this->slug,
             'title' => $this->title,
-            'location' => $this->location,
+            'location' => $this->displayLocation(),
             'short_location' => $shortLocation,
             'city' => $this->city ?? 'Ahmedabad',
-            'bhk' => $this->bhk,
+            'bhk' => $this->displayBhk(),
             'area' => $this->area,
             'possession' => $this->possession,
             'price' => $this->price,
@@ -272,7 +471,7 @@ class Property extends Model
             'is_new' => $this->is_new,
             'is_trending' => $this->is_trending,
             'rera_id' => $overview['rera_id'] ?? null,
-            'brochure_url' => $this->brochure_url,
+            'brochure_url' => $this->resolveBrochureUrl(),
             'property_type_label' => $this->propertyTypeLabel(),
         ];
     }
@@ -314,13 +513,26 @@ class Property extends Model
 
     public function toDetailArray(): array
     {
-        $overview = $this->overview ?? [];
+        $unitConfigurations = $this->unitConfigurationItems();
+        $overviewInput = $this->overview ?? [];
+
+        if ($unitConfigurations !== []) {
+            $overviewInput['unit_configurations'] = $unitConfigurations;
+        }
+
+        $overview = PropertyOverview::buildPayload([
+            'area' => $this->area,
+            'bhk' => $this->displayBhk(),
+            'price' => $this->price,
+            'possession' => $this->possession,
+            'overview' => $overviewInput,
+        ]);
 
         return [
             'slug' => $this->slug,
             'title' => $this->title,
-            'location' => $this->location,
-            'bhk' => $this->bhk,
+            'location' => $this->displayLocation(),
+            'bhk' => $this->displayBhk(),
             'area' => $this->area,
             'possession' => $this->possession,
             'price' => $this->price,
@@ -335,25 +547,128 @@ class Property extends Model
                 'price_range' => $overview['price_range'] ?? $this->price,
                 'possession' => $overview['possession'] ?? $this->possession,
                 'rera_id' => $overview['rera_id'] ?? 'Available on request',
+                'unit_configurations' => PropertyUnitConfiguration::presentationItems($unitConfigurations),
+                'items' => PropertyUnitConfiguration::overviewGridItems($overview),
             ],
-            'amenities' => $this->amenities ?? [],
+            'amenities' => $this->amenityItems(),
             'faqs' => $this->faqs ?? [],
-            'map_embed_url' => $this->map_embed_url ?: (filled($this->location) ? MapEmbed::mapUrl($this->location) : null),
-            'street_view_embed_url' => $this->street_view_embed_url ?: (filled($this->location) ? MapEmbed::streetViewUrl($this->location) : null),
-            'brochure_url' => $this->brochure_url,
+            'map_embed_url' => $this->map_embed_url ?: (filled($this->displayLocation()) ? MapEmbed::mapUrl($this->displayLocation()) : null),
+            'street_view_embed_url' => $this->resolveStreetViewEmbedUrl(),
+            'brochure_url' => $this->resolveBrochureUrl(),
             'is_new' => $this->is_new,
         ];
     }
 
+    public function resolveBrochureUrl(): ?string
+    {
+        if (blank($this->brochure_url)) {
+            return null;
+        }
+
+        if (SiteAsset::isAbsoluteUrl($this->brochure_url)) {
+            return $this->brochure_url;
+        }
+
+        return Storage::disk('public')->url(ltrim($this->brochure_url, '/'));
+    }
+
+    public function resolveStreetViewEmbedUrl(): ?string
+    {
+        if ($this->show_street_view === false) {
+            return null;
+        }
+
+        if (filled($this->street_view_embed_url)) {
+            return $this->street_view_embed_url;
+        }
+
+        return filled($this->displayLocation())
+            ? MapEmbed::streetViewUrl($this->displayLocation())
+            : null;
+    }
+
     public static function parsePriceMinLakhs(string $price): float
     {
-        if (preg_match('/₹?\s*([\d.]+)\s*(Cr(?:ore)?|Lakhs?|Lacs?|L\b)/i', $price, $matches)) {
-            $value = (float) $matches[1];
-            $unit = strtolower($matches[2]);
+        $parsed = IndianPrice::parseRange($price);
 
-            return str_starts_with($unit, 'c') ? $value * 100 : $value;
+        if ($parsed['min'] !== null) {
+            return IndianPrice::toMinLakhs($parsed['min']);
         }
 
         return 0;
+    }
+
+    public static function isReadyToMove(?string $possession): bool
+    {
+        return filled($possession) && str_contains(strtolower($possession), 'ready');
+    }
+
+    public static function parsePossessionDate(?string $possession): ?string
+    {
+        if (blank($possession) || self::isReadyToMove($possession)) {
+            return null;
+        }
+
+        $normalized = trim(str_replace(',', '', $possession));
+
+        try {
+            return Carbon::parse('1 '.$normalized)->startOfMonth()->format('Y-m-d');
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    public static function formatMonthYear(?string $date): ?string
+    {
+        if (blank($date)) {
+            return null;
+        }
+
+        return Carbon::parse($date)->startOfMonth()->format('F Y');
+    }
+
+    public static function parseLaunchDate(?string $launchDate): ?string
+    {
+        return self::parsePossessionDate($launchDate);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function parseBhkSelections(array|string|null $bhk): array
+    {
+        if (is_array($bhk)) {
+            return array_values(array_filter(array_map('trim', $bhk)));
+        }
+
+        if (blank($bhk)) {
+            return [];
+        }
+
+        $knownOptions = array_keys(app(\App\Services\LookupOptionService::class)->configurationsForAdmin());
+        $matched = [];
+
+        foreach ($knownOptions as $option) {
+            if (stripos($bhk, $option) !== false) {
+                $matched[] = $option;
+            }
+        }
+
+        if ($matched !== []) {
+            return $matched;
+        }
+
+        return array_values(array_filter(array_map(
+            'trim',
+            preg_split('/\s*,\s*/', $bhk) ?: []
+        )));
+    }
+
+    /**
+     * @param  list<string>  $selections
+     */
+    public static function composeBhkSelections(array $selections): string
+    {
+        return implode(', ', array_values(array_filter(array_map('trim', $selections))));
     }
 }

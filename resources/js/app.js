@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initPropertyMobileSlider();
     initPropertyFaq();
     initPropertyInquiryModal();
+    initPropertyBrochureModal();
     initHomeLoanBankModal();
     initBannerPromoModal();
 });
@@ -597,6 +598,44 @@ function initPropertyInquiryModal() {
     const backdrop = document.getElementById('property-inquiry-modal-backdrop');
     const closeBtn = document.getElementById('property-inquiry-modal-close');
     const triggers = document.querySelectorAll('[data-open-property-inquiry]');
+
+    if (!modal) return;
+
+    function openModal() {
+        modal.classList.add('is-open');
+        modal.classList.remove('hidden');
+        document.body.classList.add('consultation-modal-open');
+        closeBtn?.focus();
+    }
+
+    function closeModal() {
+        modal.classList.remove('is-open');
+        modal.classList.add('hidden');
+        document.body.classList.remove('consultation-modal-open');
+    }
+
+    triggers.forEach((trigger) => {
+        trigger.addEventListener('click', (event) => {
+            event.preventDefault();
+            openModal();
+        });
+    });
+
+    closeBtn?.addEventListener('click', closeModal);
+    backdrop?.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+            closeModal();
+        }
+    });
+}
+
+function initPropertyBrochureModal() {
+    const modal = document.getElementById('property-brochure-modal');
+    const backdrop = document.getElementById('property-brochure-modal-backdrop');
+    const closeBtn = document.getElementById('property-brochure-modal-close');
+    const triggers = document.querySelectorAll('[data-open-brochure-modal]');
 
     if (!modal) return;
 

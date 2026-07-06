@@ -36,7 +36,7 @@ class PropertyService
 
     public function related(Property $property, int $limit = 3): array
     {
-        $locationNeedle = strtolower(explode(',', $property->location)[0]);
+        $locationNeedle = strtolower(explode(',', $property->displayLocation())[0]);
 
         $related = Property::query()
             ->active()
@@ -105,7 +105,7 @@ class PropertyService
         return $items->map(fn (Property $property) => [
             'title' => $property->title,
             'image' => $property->image_url,
-            'address' => $property->location,
+            'address' => $property->displayLocation(),
             'postcode' => $property->postcode(),
             'slug' => $property->slug,
         ])->all();
@@ -202,7 +202,7 @@ class PropertyService
 
         return $items->map(fn (Property $property) => [
             'title' => $property->title,
-            'location' => trim(explode(',', $property->location)[0] ?? $property->location),
+            'location' => trim(explode(',', $property->displayLocation())[0] ?? $property->displayLocation()),
             'image' => $property->image_url,
             'slug' => $property->slug,
             'subtitle' => 'Discover premium properties at '.$property->title,

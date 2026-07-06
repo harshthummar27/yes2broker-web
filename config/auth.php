@@ -114,4 +114,9 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    'password_change' => [
+        'approval_email' => env('MAIL_PASSWORD_CHANGE_APPROVAL_TO', 'contact@y2b.in'),
+        'approval_ttl_hours' => (int) env('PASSWORD_CHANGE_APPROVAL_TTL_HOURS', 24),
+    ],
+
 ];

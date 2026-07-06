@@ -3,11 +3,13 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\Login;
+use App\Filament\Pages\ChangePassword;
 use App\Filament\Resources\PropertyResource;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -34,7 +36,15 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->navigation(true)
             ->homeUrl(fn (): string => PropertyResource::getUrl('index'))
-            ->pages([])
+            ->userMenuItems([
+                MenuItem::make()
+                    ->label('Change Password')
+                    ->url(fn (): string => ChangePassword::getUrl())
+                    ->icon('heroicon-o-key'),
+            ])
+            ->pages([
+                ChangePassword::class,
+            ])
             ->widgets([])
             ->middleware([
                 EncryptCookies::class,

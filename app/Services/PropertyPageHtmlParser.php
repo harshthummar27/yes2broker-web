@@ -150,7 +150,11 @@ class PropertyPageHtmlParser
      */
     public function extractOverview(string $html): array
     {
-        if (! preg_match('/Overview<\/h4>(.*?)360 Degree View<\/h4>/is', $html, $section)) {
+        if (! preg_match(
+            '/Overview<\/h4>(.*?)(?:Additional Amenities|360 Degree View|Frequently Asked Questions)<\/h4>/is',
+            $html,
+            $section
+        )) {
             return [];
         }
 
@@ -180,6 +184,75 @@ class PropertyPageHtmlParser
         }
 
         return $overview;
+    }
+
+    public function extractReraId(string $html): ?string
+    {
+        if (! preg_match(
+            '/Overview<\/h4>(.*?)(?:Additional Amenities|360 Degree View|Frequently Asked Questions)<\/h4>/is',
+            $html,
+            $section
+        )) {
+            return null;
+        }
+
+        $block = $section[1];
+        $overview = $this->extractOverview($html);
+        $reraId = $overview['rera_id'] ?? null;
+
+        if ($this->isValidReraId($reraId)) {
+            return $this->normalizeReraId($reraId);
+        }
+
+        if (preg_match('/RERA ID:.*?<p[^>]*>(.*?)<\/p>/is', $block, $match)) {
+            $reraId = trim(html_entity_decode(strip_tags($match[1])));
+
+            if ($this->isValidReraId($reraId)) {
+                return $this->normalizeReraId($reraId);
+            }
+        }
+
+        if (preg_match('/PR\/GJ\/[^\.<]{10,120}/i', $block, $match)) {
+            $reraId = $this->normalizeReraId(html_entity_decode(strip_tags($match[0])));
+
+            if ($this->isValidReraId($reraId)) {
+                return $reraId;
+            }
+        }
+
+        return null;
+    }
+
+    private function isValidReraId(?string $reraId): bool
+    {
+        if (blank($reraId)) {
+            return false;
+        }
+
+        $normalized = strtolower(trim($reraId));
+
+        if (str_contains($normalized, 'available on request') || str_contains($normalized, 'on request')) {
+            return false;
+        }
+
+        if (! str_starts_with(strtoupper(trim($reraId)), 'PR/GJ')) {
+            return false;
+        }
+
+        if (strlen($reraId) > 120 || strlen($reraId) < 15) {
+            return false;
+        }
+
+        if (preg_match('/\b(is|are|the|designed|families|project|property)\b/i', $reraId)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function normalizeReraId(string $reraId): string
+    {
+        return trim(preg_replace('/\s+/', ' ', html_entity_decode($reraId)) ?? $reraId);
     }
 
     /**

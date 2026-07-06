@@ -98,7 +98,7 @@
 
                         <button type="button"
                                 @if(filled($property['brochure_url'] ?? null))
-                                    onclick="window.open('{{ $property['brochure_url'] }}', '_blank')"
+                                    data-open-brochure-modal
                                 @else
                                     data-open-property-inquiry
                                 @endif
@@ -125,31 +125,16 @@
 {{-- Overview --}}
 <section class="py-10 bg-white">
     <div class="max-w-7xl mx-auto px-4">
-        <h2 class="text-2xl font-bold text-y2b-primary mb-8">Overview</h2>
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            @foreach([
-                ['label' => 'Project Area', 'value' => $property['overview']['project_area']],
-                ['label' => 'Configurations & Sizes', 'value' => $property['overview']['configurations']],
-                ['label' => 'Project Size', 'value' => $property['overview']['project_size']],
-                ['label' => 'Launch Date', 'value' => $property['overview']['launch_date']],
-                ['label' => 'Price Range', 'value' => $property['overview']['price_range']],
-                ['label' => 'Possession Date', 'value' => $property['overview']['possession']],
-            ] as $item)
-                <div class="property-overview-card flex gap-4 p-5 rounded-xl border border-gray-100 bg-gray-50">
-                    <div class="w-11 h-11 shrink-0 rounded-full bg-y2b-primary/10 text-y2b-primary flex items-center justify-center">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 512 512"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">{{ $item['label'] }}</p>
-                        <p class="text-sm font-semibold text-y2b-primary">{!! nl2br(e($item['value'])) !!}</p>
-                    </div>
-                </div>
-            @endforeach
-        </div>
+        <h2 class="text-2xl font-bold text-y2b-primary text-center mb-10">Overview</h2>
 
-        <div class="mt-5 p-5 rounded-xl border border-y2b-light bg-y2b-light/30">
-            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">RERA ID</p>
-            <p class="text-sm font-medium text-y2b-primary break-words">{{ $property['overview']['rera_id'] }}</p>
+        <div class="property-overview-grid">
+            @foreach($property['overview']['items'] ?? [] as $item)
+                <x-property-overview-item
+                    :icon="$item['icon']"
+                    :label="$item['label']"
+                    :value="$item['value']"
+                    :value-style="$item['value_style'] ?? 'default'" />
+            @endforeach
         </div>
     </div>
 </section>
@@ -174,11 +159,17 @@
 <section class="py-10 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-2xl font-bold text-y2b-primary mb-8">Additional Amenities</h2>
-        <div class="grid sm:grid-cols-2 gap-x-12 gap-y-4">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             @foreach($property['amenities'] as $amenity)
-                <div class="flex items-start gap-3 text-gray-700 text-sm">
-                    <span class="w-2 h-2 rounded-full bg-y2b-accent shrink-0 mt-2"></span>
-                    <span class="break-words">{{ $amenity }}</span>
+                @php
+                    $name = is_array($amenity) ? ($amenity['name'] ?? '') : $amenity;
+                    $icon = is_array($amenity) ? ($amenity['icon'] ?? 'default') : 'default';
+                @endphp
+                <div class="flex items-start gap-3 p-4 rounded-xl border border-gray-100 bg-white shadow-sm">
+                    <div class="w-10 h-10 shrink-0 rounded-full bg-y2b-primary/10 text-y2b-primary flex items-center justify-center">
+                        <x-amenity-icon :icon="$icon" class="w-5 h-5" />
+                    </div>
+                    <span class="text-gray-700 text-sm font-medium break-words pt-2">{{ $name }}</span>
                 </div>
             @endforeach
         </div>
@@ -315,4 +306,29 @@
 @endif
 
 <x-property-inquiry-modal :property-title="$property['title']" />
+
+@if(filled($property['brochure_url'] ?? null))
+    <x-property-brochure-modal
+        :property-title="$property['title']"
+        :property-slug="$property['slug']"
+    />
+@endif
+
+@push('scripts')
+    @if(request()->boolean('brochure') && filled($property['brochure_url'] ?? null))
+        <script>
+            window.addEventListener('DOMContentLoaded', function () {
+                document.querySelector('[data-open-brochure-modal]')?.click();
+            });
+        </script>
+    @endif
+
+    @if(old('download_brochure') && filled($property['brochure_url'] ?? null))
+        <script>
+            window.addEventListener('DOMContentLoaded', function () {
+                document.querySelector('[data-open-brochure-modal]')?.click();
+            });
+        </script>
+    @endif
+@endpush
 @endsection

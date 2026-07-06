@@ -7,9 +7,13 @@ use App\Services\HomePromoService;
 use App\Services\LookupOptionService;
 use App\Services\PropertyService;
 use App\Support\PossessionFilter;
+use App\Support\SiteAsset;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class PropertyController extends Controller
 {
@@ -50,6 +54,34 @@ class PropertyController extends Controller
         return view('pages.properties.show', [
             'property' => $record->toDetailArray(),
             'relatedProperties' => $this->properties->related($record),
+        ]);
+    }
+
+    public function brochure(string $slug, Request $request): RedirectResponse|BinaryFileResponse
+    {
+        if (! $request->session()->pull("brochure_access.{$slug}", false)) {
+            abort(403, 'Please submit the form to download the brochure.');
+        }
+
+        $record = $this->properties->findActiveBySlug($slug);
+        abort_if($record === null || blank($record->brochure_url), 404);
+
+        $filename = basename($record->brochure_url) ?: ($slug.'-brochure.pdf');
+
+        if (SiteAsset::isAbsoluteUrl($record->brochure_url)) {
+            return redirect()->away($record->brochure_url);
+        }
+
+        $path = Storage::disk('public')->path(ltrim($record->brochure_url, '/'));
+
+        if (! is_file($path)) {
+            return redirect()
+                ->route('properties.show', $slug)
+                ->with('error', 'Brochure file is missing. Please contact us and we will send it to you.');
+        }
+
+        return response()->download($path, $filename, [
+            'Content-Type' => 'application/pdf',
         ]);
     }
 

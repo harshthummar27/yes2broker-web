@@ -31,7 +31,22 @@ class StorePropertyInquiryRequest extends FormRequest
             'email' => ValidationRules::email(),
             'message' => ['nullable', 'string', 'max:2000'],
             'source' => ['nullable', 'string', 'max:100'],
+            'property_slug' => ['nullable', 'string', 'max:255'],
+            'download_brochure' => ['nullable', 'boolean'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('download_brochure')) {
+            $this->merge([
+                'download_brochure' => filter_var(
+                    $this->input('download_brochure'),
+                    FILTER_VALIDATE_BOOLEAN,
+                    FILTER_NULL_ON_FAILURE
+                ) ?? false,
+            ]);
+        }
     }
 
     /**

@@ -11,6 +11,7 @@ use App\Http\Requests\StoreHomeLoanRequest;
 use App\Http\Requests\StoreListPropertyRequest;
 use App\Http\Requests\StoreNewsletterRequest;
 use App\Http\Requests\StorePropertyInquiryRequest;
+use App\Models\Property;
 use App\Services\EnquiryDispatcher;
 use Illuminate\Http\RedirectResponse;
 use Throwable;
@@ -98,11 +99,46 @@ class EnquiryController extends Controller
             ? 'Property Inquiry — '.$validated['property']
             : 'Property Inquiry';
 
-        return $this->send(
-            $title,
-            $validated,
-            'Thank you! Your property inquiry has been sent successfully.'
-        );
+        if (! empty($validated['download_brochure'])) {
+            $title = ! empty($validated['property'])
+                ? 'Brochure Download — '.$validated['property']
+                : 'Brochure Download';
+        }
+
+        $mailFailed = false;
+
+        try {
+            $source = $validated['source'] ?? null;
+            $this->enquiryDispatcher->dispatch($title, $validated, is_string($source) ? $source : null);
+        } catch (Throwable $exception) {
+            report($exception);
+            $mailFailed = true;
+
+            if (empty($validated['download_brochure'])) {
+                return back()
+                    ->withInput()
+                    ->with('error', 'Sorry, we could not send your enquiry right now. Please try again or call us directly.');
+            }
+        }
+
+        if (! empty($validated['download_brochure']) && ! empty($validated['property_slug'])) {
+            $property = Property::query()
+                ->where('slug', $validated['property_slug'])
+                ->where('is_active', true)
+                ->first();
+
+            if ($property !== null && filled($property->brochure_url)) {
+                $request->session()->put("brochure_access.{$property->slug}", true);
+
+                return redirect()->route('properties.brochure', $property->slug);
+            }
+
+            return redirect()
+                ->route('properties.show', $validated['property_slug'])
+                ->with('error', 'Brochure is not available for this property yet. Our team will contact you shortly.');
+        }
+
+        return back()->with('success', 'Thank you! Your property inquiry has been sent successfully.');
     }
 
     /**

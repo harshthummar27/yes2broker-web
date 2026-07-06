@@ -5,12 +5,17 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PropertyResource\Pages;
 use App\Models\Property;
 use App\Services\LookupOptionService;
+use App\Support\IndianPrice;
 use App\Support\MapEmbed;
+use App\Support\ProjectAreaUnit;
+use App\Support\PropertyOverview;
+use App\Support\PropertyUnitConfiguration;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
 class PropertyResource extends Resource
@@ -47,30 +52,135 @@ class PropertyResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
-                        Forms\Components\Textarea::make('location')
-                            ->required()
-                            ->rows(2)
+                        Forms\Components\Fieldset::make('Location')
+                            ->schema([
+                                Forms\Components\TextInput::make('address_line_1')
+                                    ->label('Address Line 1')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->columnSpanFull(),
+                                Forms\Components\TextInput::make('address_line_2')
+                                    ->label('Address Line 2')
+                                    ->maxLength(255)
+                                    ->columnSpanFull(),
+                                Forms\Components\Select::make('city')
+                                    ->options(fn (): array => app(LookupOptionService::class)->citiesForAdmin())
+                                    ->default(fn (): string => app(LookupOptionService::class)->defaultCityName())
+                                    ->required()
+                                    ->searchable()
+                                    ->native(false)
+                                    ->live()
+                                    ->afterStateUpdated(fn (Forms\Set $set) => $set('locality', null)),
+                                Forms\Components\Select::make('locality')
+                                    ->options(fn (Forms\Get $get): array => app(LookupOptionService::class)->localitiesForAdmin($get('city')))
+                                    ->searchable()
+                                    ->native(false),
+                                Forms\Components\Select::make('state')
+                                    ->options(fn (): array => app(LookupOptionService::class)->statesForAdmin())
+                                    ->default('Gujarat')
+                                    ->required()
+                                    ->searchable()
+                                    ->native(false),
+                            ])
+                            ->columns(2)
                             ->columnSpanFull(),
-                        Forms\Components\TextInput::make('bhk')
-                            ->label('Configuration / BHK')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('area')
+                        Forms\Components\TextInput::make('project_area_value')
                             ->label('Project Area')
+                            ->numeric()
                             ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('possession')
+                            ->minValue(0)
+                            ->step(0.0001)
+                            ->live(debounce: 300),
+                        Forms\Components\Select::make('project_area_unit')
+                            ->label('Project Unit')
+                            ->options(fn (): array => app(LookupOptionService::class)->projectUnitsForAdmin())
+                            ->default(fn (): string => app(LookupOptionService::class)->defaultProjectUnitName())
+                            ->required()
+                            ->native(false)
+                            ->live()
+                            ->afterStateUpdated(function (?string $state, Forms\Set $set, Forms\Get $get, ?string $old): void {
+                                if (blank($state) || blank($old) || $state === $old) {
+                                    return;
+                                }
+
+                                $value = $get('project_area_value');
+
+                                if ($value === null || $value === '') {
+                                    return;
+                                }
+
+                                $converted = ProjectAreaUnit::convert((float) $value, $old, $state);
+                                $set('project_area_value', ProjectAreaUnit::formatValue($converted));
+                            }),
+                        Forms\Components\Placeholder::make('area_preview')
+                            ->label('Calculated project area')
+                            ->content(function (Forms\Get $get): string {
+                                $formatted = Property::formatProjectArea(
+                                    $get('project_area_value'),
+                                    $get('project_area_unit')
+                                );
+
+                                return filled($formatted) ? $formatted : '—';
+                            })
+                            ->live()
+                            ->columnSpanFull(),
+                        Forms\Components\Toggle::make('possession_is_ready')
+                            ->label('Ready to Move')
+                            ->default(false)
+                            ->live(),
+                        Forms\Components\DatePicker::make('possession_date')
                             ->label('Possession Date')
+                            ->required(fn (Forms\Get $get): bool => ! $get('possession_is_ready'))
+                            ->hidden(fn (Forms\Get $get): bool => (bool) $get('possession_is_ready'))
+                            ->native(false)
+                            ->displayFormat('F Y')
+                            ->format('Y-m-d')
+                            ->closeOnDateSelection()
+                            ->dehydrateStateUsing(function (?string $state): ?string {
+                                if (blank($state)) {
+                                    return null;
+                                }
+
+                                return \Carbon\Carbon::parse($state)->startOfMonth()->format('Y-m-d');
+                            }),
+                        Forms\Components\TextInput::make('price_min_amount')
+                            ->label('Price Min (₹)')
+                            ->numeric()
                             ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('price')
-                            ->label('Price Range')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\Select::make('city')
-                            ->options(fn (): array => app(LookupOptionService::class)->citiesForAdmin())
-                            ->default(fn (): ?string => array_key_first(app(LookupOptionService::class)->citiesForAdmin()))
-                            ->searchable(),
+                            ->minValue(1)
+                            ->live(debounce: 300),
+                        Forms\Components\TextInput::make('price_max_amount')
+                            ->label('Price Max (₹)')
+                            ->numeric()
+                            ->minValue(1)
+                            ->live(debounce: 300)
+                            ->helperText('Optional. Leave empty for “Onwards” pricing.'),
+                        Forms\Components\Placeholder::make('price_min_preview')
+                            ->label('Min price preview')
+                            ->content(fn (Forms\Get $get): string => IndianPrice::previewLine(
+                                filled($get('price_min_amount')) ? (float) $get('price_min_amount') : null
+                            )),
+                        Forms\Components\Placeholder::make('price_max_preview')
+                            ->label('Max price preview')
+                            ->content(fn (Forms\Get $get): string => IndianPrice::previewLine(
+                                filled($get('price_max_amount')) ? (float) $get('price_max_amount') : null
+                            ))
+                            ->visible(fn (Forms\Get $get): bool => filled($get('price_max_amount'))),
+                        Forms\Components\Placeholder::make('price_range_preview')
+                            ->label('Price range preview')
+                            ->content(function (Forms\Get $get): string {
+                                if (blank($get('price_min_amount'))) {
+                                    return '—';
+                                }
+
+                                $formatted = IndianPrice::formatRange(
+                                    (float) $get('price_min_amount'),
+                                    filled($get('price_max_amount')) ? (float) $get('price_max_amount') : null
+                                );
+
+                                return filled($formatted) ? $formatted : '—';
+                            })
+                            ->columnSpanFull(),
                         Forms\Components\Select::make('property_type')
                             ->label('Property Type')
                             ->options(fn (): array => app(LookupOptionService::class)->propertyTypesForAdmin())
@@ -145,27 +255,126 @@ class PropertyResource extends Resource
                             ->rows(5)
                             ->columnSpanFull(),
                         Forms\Components\Fieldset::make('Overview')
-                            ->columns(2)
                             ->schema([
-                                Forms\Components\TextInput::make('overview.project_area')
-                                    ->label('Project Area'),
-                                Forms\Components\TextInput::make('overview.configurations')
-                                    ->label('Configurations & Sizes'),
+                                Forms\Components\Repeater::make('overview.unit_configurations')
+                                    ->label('Configurations, Sizes & Units')
+                                    ->helperText('Add one row per configuration (required). Example: 1 BHK Apartment — 4000 Sq. Ft. — 80 units available.')
+                                    ->live()
+                                    ->minItems(1)
+                                    ->schema([
+                                        Forms\Components\Select::make('configuration')
+                                            ->label('Configuration / BHK')
+                                            ->options(fn (): array => app(LookupOptionService::class)->configurationsForAdmin())
+                                            ->searchable()
+                                            ->native(false)
+                                            ->required()
+                                            ->columnSpanFull(),
+                                        Forms\Components\TextInput::make('size_value')
+                                            ->label('Size')
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->step(0.01)
+                                            ->required(),
+                                        Forms\Components\Select::make('size_unit')
+                                            ->label('Size Unit')
+                                            ->options(fn (): array => app(LookupOptionService::class)->projectUnitsForAdmin())
+                                            ->default('Sq. Ft.')
+                                            ->native(false)
+                                            ->required(),
+                                        Forms\Components\TextInput::make('total_units')
+                                            ->label('Total Units')
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->live(onBlur: true)
+                                            ->afterStateUpdated(function (?string $state, Forms\Set $set, Forms\Get $get): void {
+                                                $available = $get('available_units');
+
+                                                if (filled($state) && filled($available) && (int) $available > (int) $state) {
+                                                    $set('available_units', (int) $state);
+                                                }
+                                            }),
+                                        Forms\Components\TextInput::make('available_units')
+                                            ->label('Available Units')
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(fn (Forms\Get $get): ?int => filled($get('total_units'))
+                                                ? (int) $get('total_units')
+                                                : null)
+                                            ->helperText(fn (Forms\Get $get): ?string => filled($get('total_units'))
+                                                ? 'Maximum '.$get('total_units').' (total units).'
+                                                : null)
+                                            ->rule(function (Forms\Get $get): array {
+                                                if (! filled($get('total_units'))) {
+                                                    return ['nullable', 'integer', 'min:0'];
+                                                }
+
+                                                return ['nullable', 'integer', 'min:0', 'max:'.(int) $get('total_units')];
+                                            }),
+                                    ])
+                                    ->columns(2)
+                                    ->defaultItems(1)
+                                    ->collapsible()
+                                    ->itemLabel(function (array $state): ?string {
+                                        if (blank($state['configuration'] ?? null)) {
+                                            return null;
+                                        }
+
+                                        $size = filled($state['size_value'] ?? null)
+                                            ? trim($state['size_value'].' '.($state['size_unit'] ?? ''))
+                                            : null;
+
+                                        return $size
+                                            ? $state['configuration'].' — '.$size
+                                            : (string) $state['configuration'];
+                                    })
+                                    ->columnSpanFull(),
+                                Forms\Components\Placeholder::make('overview_listing_units_table')
+                                    ->label('Configuration data table')
+                                    ->content(function (Forms\Get $get): HtmlString {
+                                        $items = PropertyUnitConfiguration::normalizeList(
+                                            is_array($get('overview.unit_configurations')) ? $get('overview.unit_configurations') : []
+                                        );
+
+                                        return new HtmlString(view('filament.forms.property-listing-units-table', [
+                                            'rows' => PropertyOverview::configurationTableRows($items),
+                                        ])->render());
+                                    })
+                                    ->columnSpanFull(),
                                 Forms\Components\TextInput::make('overview.project_size')
-                                    ->label('Project Size'),
-                                Forms\Components\TextInput::make('overview.launch_date')
-                                    ->label('Launch Date'),
-                                Forms\Components\TextInput::make('overview.price_range')
-                                    ->label('Price Range'),
-                                Forms\Components\TextInput::make('overview.possession')
-                                    ->label('Possession Date'),
+                                    ->label('Project Size')
+                                    ->helperText('Example: 1 Building – 100 units')
+                                    ->visible(function (Forms\Get $get): bool {
+                                        $items = PropertyUnitConfiguration::normalizeList(
+                                            is_array($get('overview.unit_configurations')) ? $get('overview.unit_configurations') : []
+                                        );
+
+                                        return $items === [];
+                                    }),
+                                Forms\Components\DatePicker::make('overview.launch_date')
+                                    ->label('Launch Date')
+                                    ->native(false)
+                                    ->displayFormat('F Y')
+                                    ->format('Y-m-d')
+                                    ->closeOnDateSelection()
+                                    ->live()
+                                    ->dehydrateStateUsing(function (?string $state): ?string {
+                                        if (blank($state)) {
+                                            return null;
+                                        }
+
+                                        return Property::formatMonthYear($state);
+                                    }),
                                 Forms\Components\Textarea::make('overview.rera_id')
                                     ->label('RERA ID')
                                     ->rows(2)
+                                    ->live()
                                     ->columnSpanFull(),
                             ]),
-                        Forms\Components\TagsInput::make('amenities')
-                            ->placeholder('Add amenity')
+                        Forms\Components\CheckboxList::make('amenities')
+                            ->label('Amenities')
+                            ->options(fn (): array => app(LookupOptionService::class)->amenityOptionsForAdmin())
+                            ->columns(2)
+                            ->bulkToggleable()
                             ->columnSpanFull(),
                         Forms\Components\Repeater::make('faqs')
                             ->schema([
@@ -183,15 +392,26 @@ class PropertyResource extends Resource
                             ->helperText('Paste the full <iframe> code from Google Maps → Share → Embed a map, or paste only the embed URL.')
                             ->dehydrateStateUsing(fn (?string $state): ?string => MapEmbed::normalizeEmbedInput($state))
                             ->columnSpanFull(),
-                        Forms\Components\Textarea::make('street_view_embed_url')
-                            ->label('360° / Street View Embed')
-                            ->rows(4)
-                            ->helperText('Paste the full <iframe> code or only the Street View embed URL.')
-                            ->dehydrateStateUsing(fn (?string $state): ?string => MapEmbed::normalizeEmbedInput($state))
+                        Forms\Components\Toggle::make('show_street_view')
+                            ->label('Show 360° / Street View section')
+                            ->default(true)
+                            ->live()
                             ->columnSpanFull(),
-                        Forms\Components\TextInput::make('brochure_url')
-                            ->label('Brochure PDF URL')
-                            ->url()
+                        Forms\Components\Textarea::make('street_view_embed_url')
+                            ->label('360° / Street View Embed (optional)')
+                            ->rows(4)
+                            ->helperText('Optional. Leave empty to auto-generate from the property location when enabled above.')
+                            ->dehydrateStateUsing(fn (?string $state): ?string => MapEmbed::normalizeEmbedInput($state))
+                            ->visible(fn (Forms\Get $get): bool => (bool) $get('show_street_view'))
+                            ->columnSpanFull(),
+                        Forms\Components\FileUpload::make('brochure_upload')
+                            ->label('Brochure PDF')
+                            ->acceptedFileTypes(['application/pdf'])
+                            ->disk('public')
+                            ->directory('properties/brochures')
+                            ->visibility('public')
+                            ->maxSize(12288)
+                            ->helperText('Optional. If no PDF is uploaded, the Download Brochure button opens the inquiry popup on the website.')
                             ->columnSpanFull(),
                     ]),
                 Forms\Components\Section::make('Settings')
@@ -223,9 +443,22 @@ class PropertyResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->limit(40),
-                Tables\Columns\TextColumn::make('location')
+                Tables\Columns\TextColumn::make('locality')
                     ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('location')
+                    ->label('Full address')
+                    ->getStateUsing(fn (Property $record): string => $record->displayLocation())
+                    ->searchable(['address_line_1', 'address_line_2', 'locality', 'location'])
                     ->limit(35)
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('bhk')
+                    ->label('Configuration')
+                    ->searchable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('area')
+                    ->label('Project Area')
+                    ->searchable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('price')
                     ->sortable(),

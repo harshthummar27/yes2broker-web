@@ -7,6 +7,7 @@ use App\Http\Controllers\ChannelPartnerController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeLoanController;
 use App\Http\Controllers\ListPropertyController;
+use App\Http\Controllers\PasswordChangeApprovalController;
 use App\Http\Controllers\PropertyController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +23,7 @@ Route::get('/about-us', [AboutController::class, 'index'])->name('about');
 Route::get('/all-properties', [PropertyController::class, 'index'])->name('properties.index');
 Route::get('/all-properties/load-more', [PropertyController::class, 'loadMore'])->name('properties.load-more');
 Route::get('/property/{slug}', [PropertyController::class, 'show'])->name('properties.show');
+Route::get('/property/{slug}/brochure', [PropertyController::class, 'brochure'])->name('properties.brochure');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::get('/list-your-property', [ListPropertyController::class, 'index'])->name('list-property');
 Route::get('/become-channel-partner', [ChannelPartnerController::class, 'index'])->name('channel-partner');
@@ -34,3 +36,8 @@ Route::post('/enquiry/channel-partner', [EnquiryController::class, 'channelPartn
 Route::post('/enquiry/list-property', [EnquiryController::class, 'listProperty'])->name('enquiry.list-property');
 Route::post('/enquiry/home-loan', [EnquiryController::class, 'homeLoan'])->name('enquiry.home-loan');
 Route::post('/enquiry/property-inquiry', [EnquiryController::class, 'propertyInquiry'])->name('enquiry.property-inquiry');
+
+Route::get('/admin/password-change/{token}/approve', [PasswordChangeApprovalController::class, 'approve'])
+    ->name('admin.password-change.approve');
+Route::get('/admin/password-change/{token}/reject', [PasswordChangeApprovalController::class, 'reject'])
+    ->name('admin.password-change.reject');

@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Services\LookupOptionService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class City extends Model
@@ -46,5 +47,10 @@ class City extends Model
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('sort_order')->orderBy('name');
+    }
+
+    public function localities(): HasMany
+    {
+        return $this->hasMany(Locality::class);
     }
 }
