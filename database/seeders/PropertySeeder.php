@@ -70,5 +70,11 @@ class PropertySeeder extends Seeder
         if ($this->command) {
             $this->command->info("Properties imported/updated: {$imported}");
         }
+
+        // Clean up temporary/dummy test properties
+        Property::query()->where('slug', 'adarsh-aster-demo')->delete();
+
+        // Auto-run configurations migration to populate the new database tables
+        $this->command?->call('properties:migrate-configurations');
     }
 }

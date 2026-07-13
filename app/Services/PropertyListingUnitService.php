@@ -33,6 +33,7 @@ class PropertyListingUnitService
                 'size_unit' => $item['size_unit'],
                 'total_units' => $item['total_units'],
                 'available_units' => $item['available_units'],
+                'price' => $item['price'],
             ]);
         }
     }

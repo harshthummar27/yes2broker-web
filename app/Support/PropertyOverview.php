@@ -102,6 +102,7 @@ class PropertyOverview
                 'size' => filled($configuration['size']) ? $configuration['size'] : '—',
                 'total_units' => $totalUnits,
                 'available_units' => $configuration['available_units'] ?? null,
+                'price' => $configuration['price'] ?? null,
                 'website_configuration' => PropertyUnitConfiguration::configurationOverviewValue($configuration),
                 'website_project_size' => $totalUnits !== null
                     ? $configuration['configuration'].' - '.PropertyUnitConfiguration::formatUnitCountLabel($totalUnits)

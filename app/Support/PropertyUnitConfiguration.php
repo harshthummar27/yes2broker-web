@@ -33,6 +33,7 @@ class PropertyUnitConfiguration
                     : 'Sq. Ft.',
                 'total_units' => $totalUnits,
                 'available_units' => $availableUnits,
+                'price' => filled($item['price'] ?? null) ? (int) $item['price'] : null,
             ];
         }
 
@@ -114,6 +115,7 @@ class PropertyUnitConfiguration
                 'size' => self::formatSize($item),
                 'total_units' => $item['total_units'] ?? null,
                 'available_units' => $item['available_units'] ?? null,
+                'price' => $item['price'] ?? null,
             ];
         }, $items);
     }
@@ -280,29 +282,21 @@ class PropertyUnitConfiguration
         }
 
         if ($unitConfigurations !== []) {
+            $values = [];
             foreach (self::presentationItems($unitConfigurations) as $configuration) {
-                $items[] = [
-                    'icon' => 'configuration',
-                    'label' => 'Configurations & Sizes',
-                    'value' => self::configurationOverviewValue($configuration),
-                ];
+                $values[] = self::configurationOverviewValue($configuration, isPublic: true);
             }
+            $items[] = [
+                'icon' => 'configuration',
+                'label' => 'Configurations & Sizes',
+                'value' => implode("\n", $values),
+                'value_style' => 'list',
+            ];
         } elseif (filled($overview['configurations'] ?? null)) {
             $items[] = [
                 'icon' => 'configuration',
                 'label' => 'Configurations & Sizes',
                 'value' => (string) $overview['configurations'],
-            ];
-        }
-
-        $projectSize = self::resolveProjectSizeForDisplay($overview, $unitConfigurations);
-
-        if (filled($projectSize)) {
-            $items[] = [
-                'icon' => 'project-size',
-                'label' => 'Project Size',
-                'value' => (string) $projectSize,
-                'value_style' => 'list',
             ];
         }
 
@@ -363,7 +357,7 @@ class PropertyUnitConfiguration
     /**
      * @param  array{configuration: string, size: string, total_units: ?int, available_units: ?int}  $configuration
      */
-    public static function configurationOverviewValue(array $configuration): string
+    public static function configurationOverviewValue(array $configuration, bool $isPublic = false): string
     {
         $value = $configuration['configuration'];
 
@@ -371,10 +365,16 @@ class PropertyUnitConfiguration
             $value .= ' – '.$configuration['size'];
         }
 
-        $availableLabel = self::formatAvailableUnitsLabel($configuration['available_units'] ?? null);
+        if (filled($configuration['price'])) {
+            $value .= ' – '.IndianPrice::formatPart($configuration['price']);
+        }
 
-        if (filled($availableLabel)) {
-            $value .= "\n".$availableLabel;
+        if (! $isPublic) {
+            $availableLabel = self::formatAvailableUnitsLabel($configuration['available_units'] ?? null);
+
+            if (filled($availableLabel)) {
+                $value .= "\n".$availableLabel;
+            }
         }
 
         return $value;
@@ -446,7 +446,7 @@ class PropertyUnitConfiguration
     }
 
     /**
-     * @param  list<string>  $configurations
+     * @param  array<string, mixed>  $data
      */
     public static function syncBhkOnPropertyData(array &$data): void
     {

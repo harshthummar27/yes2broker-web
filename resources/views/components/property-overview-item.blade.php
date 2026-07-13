@@ -19,6 +19,14 @@
             @foreach($lines as $line)
                 <p class="property-overview-value">{{ $line }}</p>
             @endforeach
+        @elseif($valueStyle === 'chips')
+            <div class="flex flex-col gap-1.5 mt-1.5 items-start">
+                @foreach($lines as $line)
+                    <span class="inline-flex items-center text-y2b-primary bg-y2b-light/30 border border-y2b-light/60 px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap shadow-sm">
+                        {{ $line }}
+                    </span>
+                @endforeach
+            </div>
         @else
             @if($primaryLine !== '')
                 <p class="property-overview-value">{{ $primaryLine }}</p>

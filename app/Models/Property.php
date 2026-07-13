@@ -82,6 +82,30 @@ class Property extends Model
                 $property->slug = Str::slug($property->title);
             }
 
+            $overview = $property->overview;
+            $unitConfigs = is_array($overview['unit_configurations'] ?? null)
+                ? $overview['unit_configurations']
+                : [];
+
+            if ($unitConfigs !== []) {
+                $prices = array_filter(
+                    array_map(fn($item) => isset($item['price']) && $item['price'] !== '' ? (float) $item['price'] : null, $unitConfigs),
+                    fn($p) => $p !== null && $p > 0
+                );
+
+                if (!empty($prices)) {
+                    $property->price_min_amount = (int) min($prices);
+                    if (count($prices) > 1 && max($prices) > min($prices)) {
+                        $property->price_max_amount = (int) max($prices);
+                    } else {
+                        $property->price_max_amount = null;
+                    }
+                } else {
+                    $property->price_min_amount = null;
+                    $property->price_max_amount = null;
+                }
+            }
+
             if (filled($property->price_min_amount)) {
                 $property->price = IndianPrice::formatRange(
                     $property->price_min_amount,

@@ -17,6 +17,7 @@ class PropertyListingUnit extends Model
         'size_unit',
         'total_units',
         'available_units',
+        'price',
     ];
 
     protected function casts(): array
@@ -26,6 +27,7 @@ class PropertyListingUnit extends Model
             'total_units' => 'integer',
             'available_units' => 'integer',
             'sort_order' => 'integer',
+            'price' => 'integer',
         ];
     }
 
@@ -45,6 +47,7 @@ class PropertyListingUnit extends Model
             'size_unit' => $this->size_unit,
             'total_units' => $this->total_units,
             'available_units' => $this->available_units,
+            'price' => $this->price,
         ];
     }
 }

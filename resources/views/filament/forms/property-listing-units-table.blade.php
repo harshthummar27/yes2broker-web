@@ -13,6 +13,7 @@
                     <th class="px-3 py-2.5 font-semibold">Size</th>
                     <th class="px-3 py-2.5 font-semibold">Total Units</th>
                     <th class="px-3 py-2.5 font-semibold">Available</th>
+                    <th class="px-3 py-2.5 font-semibold">Price</th>
                     <th class="px-3 py-2.5 font-semibold">Card / Overview text</th>
                 </tr>
             </thead>
@@ -26,6 +27,9 @@
                         </td>
                         <td class="px-3 py-2.5 text-gray-700 dark:text-gray-300 whitespace-nowrap">
                             {{ $row['available_units'] !== null ? number_format((int) $row['available_units']) : '—' }}
+                        </td>
+                        <td class="px-3 py-2.5 text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                            {{ !empty($row['price']) ? \App\Support\IndianPrice::formatPart($row['price']) : '—' }}
                         </td>
                         <td class="px-3 py-2.5 text-gray-700 dark:text-gray-300 whitespace-pre-line">{{ $row['website_configuration'] }}</td>
                     </tr>

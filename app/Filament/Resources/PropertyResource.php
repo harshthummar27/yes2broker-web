@@ -143,44 +143,6 @@ class PropertyResource extends Resource
 
                                 return \Carbon\Carbon::parse($state)->startOfMonth()->format('Y-m-d');
                             }),
-                        Forms\Components\TextInput::make('price_min_amount')
-                            ->label('Price Min (₹)')
-                            ->numeric()
-                            ->required()
-                            ->minValue(1)
-                            ->live(debounce: 300),
-                        Forms\Components\TextInput::make('price_max_amount')
-                            ->label('Price Max (₹)')
-                            ->numeric()
-                            ->minValue(1)
-                            ->live(debounce: 300)
-                            ->helperText('Optional. Leave empty for “Onwards” pricing.'),
-                        Forms\Components\Placeholder::make('price_min_preview')
-                            ->label('Min price preview')
-                            ->content(fn (Forms\Get $get): string => IndianPrice::previewLine(
-                                filled($get('price_min_amount')) ? (float) $get('price_min_amount') : null
-                            )),
-                        Forms\Components\Placeholder::make('price_max_preview')
-                            ->label('Max price preview')
-                            ->content(fn (Forms\Get $get): string => IndianPrice::previewLine(
-                                filled($get('price_max_amount')) ? (float) $get('price_max_amount') : null
-                            ))
-                            ->visible(fn (Forms\Get $get): bool => filled($get('price_max_amount'))),
-                        Forms\Components\Placeholder::make('price_range_preview')
-                            ->label('Price range preview')
-                            ->content(function (Forms\Get $get): string {
-                                if (blank($get('price_min_amount'))) {
-                                    return '—';
-                                }
-
-                                $formatted = IndianPrice::formatRange(
-                                    (float) $get('price_min_amount'),
-                                    filled($get('price_max_amount')) ? (float) $get('price_max_amount') : null
-                                );
-
-                                return filled($formatted) ? $formatted : '—';
-                            })
-                            ->columnSpanFull(),
                         Forms\Components\Select::make('property_type')
                             ->label('Property Type')
                             ->options(fn (): array => app(LookupOptionService::class)->propertyTypesForAdmin())
@@ -310,6 +272,13 @@ class PropertyResource extends Resource
 
                                                 return ['nullable', 'integer', 'min:0', 'max:'.(int) $get('total_units')];
                                             }),
+                                        Forms\Components\TextInput::make('price')
+                                            ->label('Price (₹)')
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->placeholder('e.g. 1000000 for 10 Lakh')
+                                            ->helperText('Optional. Numeric value in Rupees.')
+                                            ->columnSpanFull(),
                                     ])
                                     ->columns(2)
                                     ->defaultItems(1)
@@ -319,13 +288,21 @@ class PropertyResource extends Resource
                                             return null;
                                         }
 
+                                        $label = $state['configuration'];
+
                                         $size = filled($state['size_value'] ?? null)
                                             ? trim($state['size_value'].' '.($state['size_unit'] ?? ''))
                                             : null;
 
-                                        return $size
-                                            ? $state['configuration'].' — '.$size
-                                            : (string) $state['configuration'];
+                                        if ($size) {
+                                            $label .= ' — '.$size;
+                                        }
+
+                                        if (filled($state['price'] ?? null)) {
+                                            $label .= ' — '.IndianPrice::formatPart($state['price']);
+                                        }
+
+                                        return $label;
                                     })
                                     ->columnSpanFull(),
                                 Forms\Components\Placeholder::make('overview_listing_units_table')
