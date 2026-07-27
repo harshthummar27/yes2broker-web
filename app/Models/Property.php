@@ -149,7 +149,7 @@ class Property extends Model
                 );
             }
 
-            $property->syncOverviewFromListingFields();
+            $property->syncOverviewFromListingFields($unitConfigs);
 
             $locationForMaps = $property->displayLocation();
 
@@ -239,7 +239,7 @@ class Property extends Model
         }
     }
 
-    public function syncOverviewFromListingFields(): void
+    public function syncOverviewFromListingFields(?array $unitConfigurations = null): void
     {
         $this->overview = PropertyOverview::buildPayload([
             'area' => $this->area,
@@ -249,7 +249,7 @@ class Property extends Model
             'overview' => $this->overview ?? [],
         ]);
 
-        $unitConfigurations = $this->unitConfigurationItems();
+        $unitConfigurations = $unitConfigurations ?? $this->unitConfigurationItems();
 
         if ($unitConfigurations !== []) {
             $composed = PropertyUnitConfiguration::composeBhkLabel($unitConfigurations);

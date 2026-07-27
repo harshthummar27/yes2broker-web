@@ -143,11 +143,23 @@ class PropertyResource extends Resource
 
                                 return \Carbon\Carbon::parse($state)->startOfMonth()->format('Y-m-d');
                             }),
-                        Forms\Components\Select::make('property_type')
-                            ->label('Property Type')
-                            ->options(fn (): array => app(LookupOptionService::class)->propertyTypesForAdmin())
-                            ->searchable()
-                            ->native(false),
+                        Forms\Components\DatePicker::make('overview.launch_date')
+                            ->label('Launch Date')
+                            ->native(false)
+                            ->displayFormat('F Y')
+                            ->format('Y-m-d')
+                            ->closeOnDateSelection()
+                            ->live()
+                            ->dehydrateStateUsing(function (?string $state): ?string {
+                                if (blank($state)) {
+                                    return null;
+                                }
+
+                                return Property::formatMonthYear($state);
+                            }),
+                        Forms\Components\TextInput::make('overview.rera_id')
+                            ->label('RERA ID')
+                            ->live(),
                     ]),
                 Forms\Components\Section::make('Media')
                     ->description('Upload images or paste an external image URL.')
@@ -223,14 +235,53 @@ class PropertyResource extends Resource
                                     ->helperText('Add one row per configuration (required). Example: 1 BHK Apartment — 4000 Sq. Ft. — 80 units available.')
                                     ->live()
                                     ->minItems(1)
+                                    ->afterStateHydrated(function (Forms\Components\Repeater $component, ?array $state): void {
+                                        if (empty($state)) {
+                                            return;
+                                        }
+
+                                        $newState = [];
+                                        foreach ($state as $item) {
+                                            if (isset($item['bhk']) || isset($item['type'])) {
+                                                $newState[] = $item;
+                                                continue;
+                                            }
+
+                                            $config = $item['configuration'] ?? '';
+                                            $parsed = self::splitConfiguration($config);
+                                            
+                                            $item['bhk'] = $parsed['bhk'];
+                                            $item['type'] = $parsed['type'];
+                                            $newState[] = $item;
+                                        }
+
+                                        $component->state($newState);
+                                    })
                                     ->schema([
-                                        Forms\Components\Select::make('configuration')
-                                            ->label('Configuration / BHK')
-                                            ->options(fn (): array => app(LookupOptionService::class)->configurationsForAdmin())
-                                            ->searchable()
-                                            ->native(false)
-                                            ->required()
-                                            ->columnSpanFull(),
+                                        Forms\Components\TextInput::make('bhk')
+                                            ->label('BHK')
+                                            ->datalist([
+                                                '1 BHK',
+                                                '2 BHK',
+                                                '3 BHK',
+                                                '4 BHK',
+                                                '5 BHK',
+                                                '1 & 2 BHK',
+                                                '2 & 3 BHK',
+                                                '3 & 4 BHK',
+                                                '4 & 5 BHK',
+                                                '3 BHK & 4 BHK',
+                                            ])
+                                            ->required(fn (Forms\Get $get): bool => blank($get('type')))
+                                            ->live(onBlur: true)
+                                            ->afterStateUpdated(fn (Forms\Set $set, Forms\Get $get) => self::updateConfiguration($set, $get)),
+                                        Forms\Components\TextInput::make('type')
+                                            ->label('Type')
+                                            ->datalist(fn (): array => array_values(app(LookupOptionService::class)->propertyTypesForAdmin()))
+                                            ->required(fn (Forms\Get $get): bool => blank($get('bhk')))
+                                            ->live(onBlur: true)
+                                            ->afterStateUpdated(fn (Forms\Set $set, Forms\Get $get) => self::updateConfiguration($set, $get)),
+                                        Forms\Components\Hidden::make('configuration'),
                                         Forms\Components\TextInput::make('size_value')
                                             ->label('Size')
                                             ->numeric()
@@ -327,25 +378,6 @@ class PropertyResource extends Resource
 
                                         return $items === [];
                                     }),
-                                Forms\Components\DatePicker::make('overview.launch_date')
-                                    ->label('Launch Date')
-                                    ->native(false)
-                                    ->displayFormat('F Y')
-                                    ->format('Y-m-d')
-                                    ->closeOnDateSelection()
-                                    ->live()
-                                    ->dehydrateStateUsing(function (?string $state): ?string {
-                                        if (blank($state)) {
-                                            return null;
-                                        }
-
-                                        return Property::formatMonthYear($state);
-                                    }),
-                                Forms\Components\Textarea::make('overview.rera_id')
-                                    ->label('RERA ID')
-                                    ->rows(2)
-                                    ->live()
-                                    ->columnSpanFull(),
                             ]),
                         Forms\Components\CheckboxList::make('amenities')
                             ->label('Amenities')
@@ -480,6 +512,31 @@ class PropertyResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function splitConfiguration(string $config): array
+    {
+        $config = trim($config);
+        
+        if (preg_match('/^(.+?\bBHKs?\b)(.*)$/ui', $config, $matches)) {
+            return [
+                'bhk' => trim($matches[1]),
+                'type' => trim($matches[2]),
+            ];
+        }
+
+        return [
+            'bhk' => '',
+            'type' => $config,
+        ];
+    }
+
+    public static function updateConfiguration(Forms\Set $set, Forms\Get $get): void
+    {
+        $bhk = $get('bhk');
+        $type = $get('type');
+        
+        $set('configuration', trim(implode(' ', array_filter([$bhk, $type]))));
     }
 
     public static function getPages(): array

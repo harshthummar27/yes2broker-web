@@ -282,20 +282,27 @@ class PropertyUnitConfiguration
         }
 
         if ($unitConfigurations !== []) {
-            $values = [];
-            foreach (self::presentationItems($unitConfigurations) as $configuration) {
-                $values[] = self::configurationOverviewValue($configuration, isPublic: true);
+            $composedBhk = self::composeBhkLabel($unitConfigurations);
+            if (filled($composedBhk)) {
+                $items[] = [
+                    'icon' => 'configuration',
+                    'label' => 'Configurations',
+                    'value' => $composedBhk,
+                ];
             }
-            $items[] = [
-                'icon' => 'configuration',
-                'label' => 'Configurations & Sizes',
-                'value' => implode("\n", $values),
-                'value_style' => 'list',
-            ];
+
+            $sizeRange = self::formatSizeRange($unitConfigurations);
+            if (filled($sizeRange)) {
+                $items[] = [
+                    'icon' => 'project-area',
+                    'label' => 'Sizes',
+                    'value' => $sizeRange,
+                ];
+            }
         } elseif (filled($overview['configurations'] ?? null)) {
             $items[] = [
                 'icon' => 'configuration',
-                'label' => 'Configurations & Sizes',
+                'label' => 'Configurations',
                 'value' => (string) $overview['configurations'],
             ];
         }
@@ -429,20 +436,46 @@ class PropertyUnitConfiguration
             return $configurations[0];
         }
 
-        $suffix = self::commonConfigurationSuffix($configurations);
+        // Recursively strip common suffixes and store them.
+        $suffixes = [];
+        $currentCores = $configurations;
 
-        if ($suffix !== null) {
-            $cores = array_map(function (string $configuration) use ($suffix): string {
+        while (true) {
+            $suffix = self::commonConfigurationSuffix($currentCores);
+            if ($suffix === null) {
+                break;
+            }
+
+            $suffixes[] = $suffix;
+            $currentCores = array_map(function (string $core) use ($suffix): string {
                 $pattern = '/\s+'.preg_quote($suffix, '/').'s?\s*$/iu';
-                $core = preg_replace($pattern, '', $configuration);
-
-                return trim($core) !== '' ? trim($core) : $configuration;
-            }, $configurations);
-
-            return implode(' & ', $cores).' '.$suffix;
+                $stripped = preg_replace($pattern, '', $core);
+                return trim($stripped) !== '' ? trim($stripped) : $core;
+            }, $currentCores);
         }
 
-        return implode(' & ', $configurations);
+        // Format the remaining cores with commas and ampersand
+        $formattedCores = self::formatListWithAmpersand($currentCores);
+
+        // Re-append the suffixes in reverse order
+        $result = $formattedCores;
+        foreach (array_reverse($suffixes) as $suf) {
+            $result .= ' ' . $suf;
+        }
+
+        return $result;
+    }
+
+    public static function formatListWithAmpersand(array $items): string
+    {
+        if (count($items) === 0) {
+            return '';
+        }
+        if (count($items) === 1) {
+            return (string) $items[0];
+        }
+        $lastItem = array_pop($items);
+        return implode(', ', $items) . ' & ' . $lastItem;
     }
 
     /**
@@ -490,6 +523,45 @@ class PropertyUnitConfiguration
         }
 
         return $normalizedSuffix;
+    }
+
+    public static function formatSizeRange(array $items): string
+    {
+        $sizes = [];
+
+        foreach ($items as $item) {
+            $value = $item['size_value'] ?? null;
+            $unit = $item['size_unit'] ?? 'Sq. Ft.';
+
+            if ($value !== null && $value !== '') {
+                $sizes[] = [
+                    'value' => (float) $value,
+                    'unit' => trim($unit)
+                ];
+            }
+        }
+
+        if ($sizes === []) {
+            return '';
+        }
+
+        if (count($sizes) === 1) {
+            return ProjectAreaUnit::formatValue($sizes[0]['value']) . ' ' . $sizes[0]['unit'];
+        }
+
+        usort($sizes, fn($a, $b) => $a['value'] <=> $b['value']);
+
+        $minItem = $sizes[0];
+        $maxItem = $sizes[count($sizes) - 1];
+
+        if ($minItem['value'] === $maxItem['value'] && $minItem['unit'] === $maxItem['unit']) {
+            return ProjectAreaUnit::formatValue($minItem['value']) . ' ' . $minItem['unit'];
+        }
+
+        $minLabel = ProjectAreaUnit::formatValue($minItem['value']) . ($minItem['unit'] !== $maxItem['unit'] ? ' ' . $minItem['unit'] : '');
+        $maxLabel = ProjectAreaUnit::formatValue($maxItem['value']) . ' ' . $maxItem['unit'];
+
+        return $minLabel . ' - ' . $maxLabel;
     }
 
     private static function toInt(mixed $value): ?int

@@ -15,6 +15,26 @@ class CreateProperty extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        $unitConfigs = is_array($data['overview']['unit_configurations'] ?? null)
+            ? $data['overview']['unit_configurations']
+            : [];
+
+        if ($unitConfigs !== []) {
+            $prices = array_filter(
+                array_map(fn($item) => isset($item['price']) && $item['price'] !== '' ? (float) $item['price'] : null, $unitConfigs),
+                fn($p) => $p !== null && $p > 0
+            );
+
+            if (!empty($prices)) {
+                $data['price_min_amount'] = (int) min($prices);
+                if (count($prices) > 1 && max($prices) > min($prices)) {
+                    $data['price_max_amount'] = (int) max($prices);
+                } else {
+                    $data['price_max_amount'] = null;
+                }
+            }
+        }
+
         $data = self::normalizeMediaFields($data);
 
         if (blank($data['image'] ?? null)) {
@@ -31,7 +51,7 @@ class CreateProperty extends CreateRecord
 
         if (blank($data['price_min_amount'] ?? null)) {
             throw \Illuminate\Validation\ValidationException::withMessages([
-                'price_min_amount' => 'Please enter a minimum price.',
+                'overview.unit_configurations' => 'Please enter a price for at least one configuration.',
             ]);
         }
 
