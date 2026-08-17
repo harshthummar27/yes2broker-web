@@ -3,17 +3,25 @@
 @section('title', 'Home')
 
 @section('content')
-{{-- Hero with video + search --}}
-<section class="relative min-h-[480px] md:min-h-[560px] flex items-center overflow-hidden">
-    <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover">
-        <source src="{{ site_asset(config('site.hero_video')) }}" type="video/mp4">
-    </video>
-    <div class="relative z-10 w-full max-w-6xl mx-auto px-4 py-16">
-        <x-property-search
-            :cities="$cities"
-            :property-types="$propertyTypes"
-            :budgets="$budgets"
-            :default-city="$defaultCity" />
+{{-- Hero section with rounded video card + bottom search filter --}}
+<section class="py-3 md:py-4 px-2 sm:px-3 md:px-4 max-w-7xl mx-auto">
+    <div class="relative w-full h-[420px] sm:h-[480px] md:h-[520px] lg:h-[560px] rounded-xl md:rounded-2xl overflow-hidden shadow-xl flex items-end justify-center pb-6 sm:pb-8 md:pb-10">
+        {{-- Video background --}}
+        <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover">
+            <source src="{{ site_asset(config('site.hero_video')) }}" type="video/mp4">
+        </video>
+
+        {{-- Gradient overlay for bottom search bar readability --}}
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none"></div>
+
+        {{-- Floating Search Bar at Bottom with margin --}}
+        <div class="relative z-10 w-full max-w-5xl px-3 sm:px-6 mb-2 sm:mb-3 md:mb-4">
+            <x-property-search
+                :cities="$cities"
+                :property-types="$propertyTypes"
+                :budgets="$budgets"
+                :default-city="$defaultCity" />
+        </div>
     </div>
 </section>
 

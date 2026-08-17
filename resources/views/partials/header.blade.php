@@ -45,7 +45,7 @@
             <img src="{{ site_asset(config('site.logo')) }}" alt="{{ config('site.name') }}" class="h-12 md:h-14 w-auto">
         </a>
 
-        <nav class="hidden xl:flex items-center gap-6 text-sm font-medium text-gray-700">
+        <nav class="hidden lg:flex items-center gap-3 lg:gap-4 xl:gap-6 text-sm lg:text-base font-semibold text-gray-700 whitespace-nowrap">
             @foreach([
                 ['route' => 'home', 'label' => 'Home'],
                 ['route' => 'about', 'label' => 'About Us'],
@@ -62,22 +62,22 @@
             @endforeach
         </nav>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 lg:gap-3 shrink-0">
             <button type="button"
                     data-open-consultation
-                    class="hidden sm:inline-flex bg-y2b-primary hover:bg-y2b-primary-dark text-white text-sm font-semibold px-5 py-2.5 rounded transition cursor-pointer">
+                    class="hidden sm:inline-flex bg-y2b-primary hover:bg-y2b-primary-dark text-white text-sm lg:text-base font-semibold px-4 lg:px-5 py-2 lg:py-2.5 rounded transition cursor-pointer whitespace-nowrap">
                 INQUIRE NOW
             </button>
 
-            <button id="mobile-menu-toggle" type="button" class="xl:hidden p-2 text-y2b-primary" aria-label="Toggle menu">
+            <button id="mobile-menu-toggle" type="button" class="lg:hidden p-2 text-y2b-primary" aria-label="Toggle menu">
                 <svg id="menu-icon-open" class="w-6 h-6" fill="currentColor" viewBox="0 0 1000 1000"><path d="M104 333H896C929 333 958 304 958 271S929 208 896 208H104C71 208 42 237 42 271S71 333 104 333ZM104 583H896C929 583 958 554 958 521S929 458 896 458H104C71 458 42 487 42 521S71 583 104 583ZM104 833H896C929 833 958 804 958 771S929 708 896 708H104C71 708 42 737 42 771S71 833 104 833Z"/></svg>
                 <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="currentColor" viewBox="0 0 1000 1000"><path d="M742 167L500 408 258 167C246 154 233 150 217 150 196 150 179 158 167 167 154 179 150 196 150 212 150 229 154 242 171 254L408 500 167 742C138 771 138 800 167 829 196 858 225 858 254 829L496 587 738 829C750 842 767 846 783 846 800 846 817 842 829 829 842 817 846 804 846 783 846 767 842 750 829 737L588 500 833 258C863 229 863 200 833 171 804 137 775 137 742 167Z"/></svg>
             </button>
         </div>
     </div>
 
-    <div id="mobile-menu" class="hidden xl:hidden border-t bg-white">
-        <nav class="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-3 text-sm font-medium">
+    <div id="mobile-menu" class="hidden lg:hidden border-t bg-white">
+        <nav class="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-3 text-base font-semibold">
             @foreach([
                 ['route' => 'home', 'label' => 'Home'],
                 ['route' => 'about', 'label' => 'About Us'],

@@ -169,16 +169,17 @@
 .property-search-bar {
     display: flex;
     flex-wrap: wrap;
-    align-items: stretch;
-    background-color: #001b73;
-    border-radius: 0.75rem;
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    align-items: center;
+    background-color: var(--color-y2b-primary);
+    border-radius: 0.875rem;
+    padding: 0.4rem 0.75rem;
+    box-shadow: 0 15px 25px -5px rgb(0 0 0 / 0.4);
 }
 
 .property-search-field {
-    flex: 1 1 140px;
+    flex: 1 1 120px;
     min-width: 0;
-    padding: 1.25rem 1.5rem;
+    padding: 0.35rem 0.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -187,29 +188,33 @@
 
 .property-search-label {
     color: #fff;
-    font-size: 0.875rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
     text-align: center;
 }
 
 .property-search-control {
     position: relative;
     width: 100%;
-    max-width: 200px;
 }
 
 .property-search-input {
     width: 100%;
     background: transparent;
     border: 0;
-    border-bottom: 1px solid #fff;
+    border-bottom: 1.5px solid rgba(255, 255, 255, 0.75);
     color: #fff;
-    font-size: 0.9375rem;
+    font-size: 0.8125rem;
     font-weight: 500;
     text-align: center;
-    padding: 0.375rem 1.5rem 0.5rem;
+    padding: 0.15rem 1rem 0.25rem;
     outline: none;
+    transition: border-color 0.2s;
+}
+
+.property-search-input:focus {
+    border-bottom-color: #fff;
 }
 
 .property-search-input::placeholder {
@@ -231,8 +236,8 @@
     right: 0;
     top: 50%;
     transform: translateY(-50%);
-    width: 1rem;
-    height: 1rem;
+    width: 0.75rem;
+    height: 0.75rem;
     color: #fff;
     pointer-events: none;
 }
@@ -240,9 +245,10 @@
 .property-search-divider {
     display: none;
     width: 1px;
-    align-self: stretch;
-    background-color: rgb(255 255 255 / 0.35);
-    margin: 1rem 0;
+    height: 1.75rem;
+    align-self: center;
+    background-color: rgba(255, 255, 255, 0.3);
+    margin: 0 0.125rem;
 }
 
 .property-search-action {
@@ -250,40 +256,41 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 1.25rem 1.25rem;
+    padding: 0.35rem 0.35rem 0.15rem;
 }
 
 .property-search-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.375rem;
     background-color: #fff;
     color: #001b73;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     font-weight: 700;
-    padding: 0.75rem 1.5rem;
+    padding: 0.45rem 1rem;
     border-radius: 0.375rem;
     border: 0;
     cursor: pointer;
-    transition: background-color 0.15s, color 0.15s;
+    transition: background-color 0.15s, color 0.15s, transform 0.15s;
     white-space: nowrap;
 }
 
 .property-search-btn:hover {
-    background-color: #091646;
-    color: #fff;
+    background-color: #f3f4f6;
+    color: #091646;
 }
 
 .property-search-btn-icon {
-    width: 1rem;
-    height: 1rem;
+    width: 0.875rem;
+    height: 0.875rem;
     flex-shrink: 0;
 }
 
 @media (min-width: 768px) {
     .property-search-bar {
         flex-wrap: nowrap;
+        padding: 0.375rem 0.75rem;
     }
 
     .property-search-divider {
@@ -292,7 +299,7 @@
 
     .property-search-action {
         flex: 0 0 auto;
-        padding: 1rem 1.5rem;
+        padding: 0.15rem 0.35rem;
     }
 }
 

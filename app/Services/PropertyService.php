@@ -36,29 +36,137 @@ class PropertyService
 
     public function related(Property $property, int $limit = 3): array
     {
-        $locationNeedle = strtolower(explode(',', $property->displayLocation())[0]);
+        $collected = collect();
 
-        $related = Property::query()
-            ->active()
-            ->where('id', '!=', $property->id)
-            ->whereRaw('LOWER(location) LIKE ?', ["%{$locationNeedle}%"])
-            ->orderByDesc('updated_at')
-            ->limit($limit)
-            ->get();
+        $city = trim($property->city ?: '');
+        $locality = trim($property->locality ?: '');
+        $priceMinLakhs = (float) ($property->price_min_lakhs ?: 0);
 
-        if ($related->count() < $limit) {
-            $existingIds = $related->pluck('id')->push($property->id)->all();
-            $more = Property::query()
-                ->active()
-                ->whereNotIn('id', $existingIds)
-                ->orderByDesc('updated_at')
-                ->limit($limit - $related->count())
-                ->get();
-
-            $related = $related->concat($more);
+        if ($priceMinLakhs <= 0 && ($property->price_min_amount ?? 0) > 0) {
+            $priceMinLakhs = (float) ($property->price_min_amount / 100000);
         }
 
-        return $related->map->toCardArray()->all();
+        // Extract area and location keywords (excluding common generic terms)
+        $ignoredTerms = ['ahmedabad', 'gujarat', 'india', strtolower($property->title)];
+        $locationParts = array_filter(
+            array_map('trim', explode(',', $property->location ?: '')),
+            fn ($part) => filled($part) && ! in_array(strtolower($part), $ignoredTerms, true)
+        );
+
+        $areaKeywords = array_values(array_unique(array_filter([
+            $locality,
+            ...$locationParts,
+        ], fn ($k) => filled($k) && strlen($k) >= 3)));
+
+        // Step 1: Match BOTH Target Location AND Target Price Range (±35%)
+        if ($priceMinLakhs > 0 && $areaKeywords !== []) {
+            $minPrice = max(0.1, $priceMinLakhs * 0.65);
+            $maxPrice = $priceMinLakhs * 1.35;
+
+            $matches = Property::query()
+                ->active()
+                ->where('id', '!=', $property->id)
+                ->where(function ($q) use ($areaKeywords) {
+                    foreach ($areaKeywords as $kw) {
+                        $term = '%'.strtolower($kw).'%';
+                        $q->orWhereRaw('LOWER(locality) LIKE ?', [$term])
+                          ->orWhereRaw('LOWER(location) LIKE ?', [$term]);
+                    }
+                })
+                ->whereBetween('price_min_lakhs', [$minPrice, $maxPrice])
+                ->orderByRaw('ABS(price_min_lakhs - ?)', [$priceMinLakhs])
+                ->limit($limit)
+                ->get();
+
+            $collected = $collected->concat($matches);
+        }
+
+        // Step 2: Match Target Location in the same locality/area regardless of price
+        if ($collected->count() < $limit && $areaKeywords !== []) {
+            $existingIds = $collected->pluck('id')->push($property->id)->all();
+
+            $matches = Property::query()
+                ->active()
+                ->whereNotIn('id', $existingIds)
+                ->where(function ($q) use ($areaKeywords) {
+                    foreach ($areaKeywords as $kw) {
+                        $term = '%'.strtolower($kw).'%';
+                        $q->orWhereRaw('LOWER(locality) LIKE ?', [$term])
+                          ->orWhereRaw('LOWER(location) LIKE ?', [$term]);
+                    }
+                })
+                ->when($priceMinLakhs > 0, fn ($q) => $q->orderByRaw('ABS(price_min_lakhs - ?)', [$priceMinLakhs]))
+                ->orderByDesc('updated_at')
+                ->limit($limit - $collected->count())
+                ->get();
+
+            $collected = $collected->concat($matches);
+        }
+
+        // Step 3: Match Target Price Range in the same city
+        if ($collected->count() < $limit && $priceMinLakhs > 0) {
+            $existingIds = $collected->pluck('id')->push($property->id)->all();
+            $minPrice = max(0.1, $priceMinLakhs * 0.50);
+            $maxPrice = $priceMinLakhs * 1.50;
+
+            $matches = Property::query()
+                ->active()
+                ->whereNotIn('id', $existingIds)
+                ->when($city !== '', function ($q) use ($city) {
+                    $term = '%'.strtolower($city).'%';
+                    $q->where(function ($sq) use ($term) {
+                        $sq->whereRaw('LOWER(city) LIKE ?', [$term])
+                          ->orWhereRaw('LOWER(location) LIKE ?', [$term]);
+                    });
+                })
+                ->whereBetween('price_min_lakhs', [$minPrice, $maxPrice])
+                ->orderByRaw('ABS(price_min_lakhs - ?)', [$priceMinLakhs])
+                ->limit($limit - $collected->count())
+                ->get();
+
+            $collected = $collected->concat($matches);
+        }
+
+        // Step 4: Match Property Type & City
+        if ($collected->count() < $limit) {
+            $existingIds = $collected->pluck('id')->push($property->id)->all();
+
+            $matches = Property::query()
+                ->active()
+                ->whereNotIn('id', $existingIds)
+                ->when(filled($property->property_type), fn ($q) => $q->where('property_type', $property->property_type))
+                ->when($city !== '', function ($q) use ($city) {
+                    $term = '%'.strtolower($city).'%';
+                    $q->where(function ($sq) use ($term) {
+                        $sq->whereRaw('LOWER(city) LIKE ?', [$term])
+                          ->orWhereRaw('LOWER(location) LIKE ?', [$term]);
+                    });
+                })
+                ->when($priceMinLakhs > 0, fn ($q) => $q->orderByRaw('ABS(price_min_lakhs - ?)', [$priceMinLakhs]))
+                ->orderByDesc('is_trending')
+                ->orderByDesc('updated_at')
+                ->limit($limit - $collected->count())
+                ->get();
+
+            $collected = $collected->concat($matches);
+        }
+
+        // Step 5: Fallback if still needed
+        if ($collected->count() < $limit) {
+            $existingIds = $collected->pluck('id')->push($property->id)->all();
+
+            $matches = Property::query()
+                ->active()
+                ->whereNotIn('id', $existingIds)
+                ->orderByDesc('is_trending')
+                ->orderByDesc('updated_at')
+                ->limit($limit - $collected->count())
+                ->get();
+
+            $collected = $collected->concat($matches);
+        }
+
+        return $collected->map->toCardArray()->all();
     }
 
     public function trending(int $limit = 12): array

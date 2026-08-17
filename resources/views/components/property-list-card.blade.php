@@ -9,11 +9,11 @@
 @endphp
 
 <article class="property-list-card bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-    <div class="flex flex-col sm:flex-row">
+    <div class="flex flex-col sm:flex-row sm:items-stretch">
         {{-- Image --}}
-        <a href="{{ $detailUrl }}" class="property-list-card-image relative shrink-0 sm:w-[240px] md:w-[280px] lg:w-[300px]">
+        <a href="{{ $detailUrl }}" class="property-list-card-image relative shrink-0 sm:w-[240px] md:w-[270px] lg:w-[300px]">
             <img src="{{ $property['image'] }}" alt="{{ $property['title'] }}"
-                 class="w-full h-52 sm:h-full sm:min-h-[220px] object-cover" loading="lazy">
+                 class="w-full h-64 sm:h-full sm:min-h-[280px] md:min-h-[300px] lg:min-h-[320px] object-cover" loading="lazy">
             @if($hasRera)
                 <span class="property-list-badge property-list-badge-rera">
                     <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
@@ -27,57 +27,59 @@
         </a>
 
         {{-- Details --}}
-        <div class="flex-1 p-4 md:p-5 min-w-0 relative">
-            @if($property['is_new'] ?? false)
-                <span class="property-list-new-tag">New Project</span>
-            @endif
-
-            <div class="flex flex-wrap items-start justify-between gap-2 mb-1 pr-24">
-                <a href="{{ $detailUrl }}" class="group min-w-0">
-                    <h3 class="text-lg md:text-xl font-bold text-y2b-primary group-hover:text-y2b-accent transition leading-snug">
-                        {{ $property['title'] }}
-                    </h3>
-                </a>
-            </div>
-
-            <p class="text-sm text-gray-500 mb-4 line-clamp-1">
-                {{ $property['bhk'] }} {{ $property['property_type_label'] ?? 'Flat' }} in {{ $property['short_location'] ?? $property['location'] }}
-            </p>
-
-            {{-- Config row --}}
-            <div class="property-list-config grid grid-cols-3 gap-px bg-gray-200 rounded-lg overflow-hidden mb-4 text-center text-sm">
-                <div class="bg-gray-50 px-2 py-3">
-                    <p class="text-[10px] uppercase tracking-wide text-gray-400 mb-0.5">Configuration</p>
-                    <p class="font-semibold text-gray-800 text-xs sm:text-sm">{{ $property['bhk'] }}</p>
-                </div>
-                <div class="bg-gray-50 px-2 py-3">
-                    <p class="text-[10px] uppercase tracking-wide text-gray-400 mb-0.5">Project Area</p>
-                    <p class="font-semibold text-gray-800 text-xs sm:text-sm">{{ $property['area'] }}</p>
-                </div>
-                <div class="bg-gray-50 px-2 py-3">
-                    <p class="text-[10px] uppercase tracking-wide text-gray-400 mb-0.5">Price</p>
-                    <p class="font-semibold text-y2b-primary text-xs sm:text-sm">{{ $property['price'] }}</p>
-                </div>
-            </div>
-
-            {{-- Meta tags --}}
-            <div class="flex flex-wrap gap-2 mb-3 text-xs text-gray-500">
-                <span class="inline-flex items-center gap-1 bg-y2b-light/60 text-y2b-primary px-2.5 py-1 rounded-full font-medium">
-                    Zero Brokerage
-                </span>
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-gray-200">
-                    <svg class="w-3 h-3 text-y2b-primary" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
-                    Possession: {{ $property['possession'] }}
-                </span>
-                @if($property['is_trending'] ?? false)
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-full border border-gray-200">
-                        Trending Project
-                    </span>
+        <div class="flex-1 p-5 md:p-6 lg:p-7 min-w-0 relative flex flex-col justify-between">
+            <div>
+                @if($property['is_new'] ?? false)
+                    <span class="property-list-new-tag">New Project</span>
                 @endif
+
+                <div class="flex flex-wrap items-start justify-between gap-2 mb-1.5 pr-24">
+                    <a href="{{ $detailUrl }}" class="group min-w-0">
+                        <h3 class="text-xl md:text-2xl font-bold text-y2b-primary group-hover:text-y2b-accent transition leading-snug">
+                            {{ $property['title'] }}
+                        </h3>
+                    </a>
+                </div>
+
+                <p class="text-sm md:text-base text-gray-500 mb-5 line-clamp-1">
+                    {{ $property['bhk'] }} {{ $property['property_type_label'] ?? 'Flat' }} in {{ $property['short_location'] ?? $property['location'] }}
+                </p>
+
+                {{-- Config row --}}
+                <div class="property-list-config grid grid-cols-3 gap-px bg-gray-200 rounded-lg overflow-hidden mb-5 text-center text-sm">
+                    <div class="bg-gray-50 px-3 py-3.5">
+                        <p class="text-[10px] uppercase tracking-wide text-gray-400 mb-1">Configuration</p>
+                        <p class="font-semibold text-gray-800 text-xs sm:text-sm md:text-base">{{ $property['bhk'] }}</p>
+                    </div>
+                    <div class="bg-gray-50 px-3 py-3.5">
+                        <p class="text-[10px] uppercase tracking-wide text-gray-400 mb-1">Project Area</p>
+                        <p class="font-semibold text-gray-800 text-xs sm:text-sm md:text-base">{{ $property['area'] }}</p>
+                    </div>
+                    <div class="bg-gray-50 px-3 py-3.5">
+                        <p class="text-[10px] uppercase tracking-wide text-gray-400 mb-1">Price</p>
+                        <p class="font-semibold text-y2b-primary text-xs sm:text-sm md:text-base">{{ $property['price'] }}</p>
+                    </div>
+                </div>
+
+                {{-- Meta tags --}}
+                <div class="flex flex-wrap gap-2 mb-4 text-xs md:text-sm text-gray-500">
+                    <span class="inline-flex items-center gap-1 bg-y2b-light/60 text-y2b-primary px-3 py-1 rounded-full font-medium">
+                        Zero Brokerage
+                    </span>
+                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full border border-gray-200">
+                        <svg class="w-3.5 h-3.5 text-y2b-primary" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+                        Possession: {{ $property['possession'] }}
+                    </span>
+                    @if($property['is_trending'] ?? false)
+                        <span class="inline-flex items-center px-3 py-1 rounded-full border border-gray-200">
+                            Trending Project
+                        </span>
+                    @endif
+                </div>
             </div>
 
             {{-- Actions --}}
-            <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-gray-100">
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-100 mt-2">
                 <p class="text-xs text-gray-400 truncate">
                     {{ config('site.name') }} Verified Listing
                 </p>
