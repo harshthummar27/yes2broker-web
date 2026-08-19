@@ -35,5 +35,5 @@
         <p class="text-[11px] text-gray-400 text-center leading-relaxed">
             Rest assured, you'll receive a call from our sales expert within the next 5 minutes.
         </p>
-    </form>
+    </form>     
 </div>

@@ -5,7 +5,7 @@
 @section('content')
 {{-- Filter bar --}}
 <section class="bg-y2b-primary py-6 md:py-8">
-    <div class="max-w-7xl mx-auto px-4">
+    <div class="max-w-7xl 2xl:max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8">
         <x-property-search
             :cities="$cities"
             :property-types="$propertyTypes"
@@ -16,7 +16,7 @@
 </section>
 
 <section class="py-8 md:py-10 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4">
+    <div class="max-w-7xl 2xl:max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid lg:grid-cols-12 gap-8">
             {{-- Main list --}}
             <div class="lg:col-span-8 xl:col-span-9 min-w-0">

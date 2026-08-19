@@ -150,6 +150,12 @@
     }
 }
 
+@media (min-width: 1536px) {
+    .trending-carousel {
+        grid-auto-columns: calc((100% - 2.625rem) / 4);
+    }
+}
+
 /* Legacy property carousel (if used elsewhere) */
 .property-carousel::-webkit-scrollbar {
     display: none;

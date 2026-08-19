@@ -4,7 +4,7 @@
 
 @section('content')
 {{-- Hero section with rounded video card + bottom search filter --}}
-<section class="py-3 md:py-4 px-2 sm:px-3 md:px-4 max-w-7xl mx-auto">
+<section class="py-3 md:py-4 px-2 sm:px-4 md:px-6 w-full">
     <div class="relative w-full h-[420px] sm:h-[480px] md:h-[520px] lg:h-[560px] rounded-xl md:rounded-2xl overflow-hidden shadow-xl flex items-end justify-center pb-6 sm:pb-8 md:pb-10">
         {{-- Video background --}}
         <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover">
@@ -15,7 +15,7 @@
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none"></div>
 
         {{-- Floating Search Bar at Bottom with margin --}}
-        <div class="relative z-10 w-full max-w-5xl px-3 sm:px-6 mb-2 sm:mb-3 md:mb-4">
+        <div class="relative z-10 w-full max-w-5xl 2xl:max-w-6xl px-3 sm:px-6 mb-2 sm:mb-3 md:mb-4">
             <x-property-search
                 :cities="$cities"
                 :property-types="$propertyTypes"
@@ -30,7 +30,7 @@
 
 {{-- Trending Properties --}}
 <section class="py-10 md:py-14 bg-white overflow-x-hidden">
-    <div class="max-w-7xl mx-auto px-4">
+    <div class="max-w-7xl 2xl:max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between gap-4 mb-6 md:mb-8">
             <h2 class="text-xl md:text-2xl font-bold text-gray-900">Our Listing</h2>
             <a href="{{ route('properties.index') }}"
@@ -86,7 +86,7 @@
 
 {{-- About Company --}}
 <section class="py-16 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
+    <div class="max-w-7xl 2xl:max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
         <div class="flex justify-center">
             <div class="about-company-image-box rounded-2xl shadow-xl p-8 md:p-10 flex items-center justify-center w-full max-w-md min-h-[280px] md:min-h-[360px]">
                 <img src="{{ site_asset(config('site.about_image')) }}" alt="About Yes2Broker"
@@ -122,7 +122,7 @@
 
 {{-- Popular Locations + Partners --}}
 <section class="py-14">
-    <div class="max-w-7xl mx-auto px-4">
+    <div class="max-w-7xl 2xl:max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-8">
             <h2 class="text-3xl font-bold text-y2b-primary">Popular Locations</h2>
             <h2 class="text-xl text-gray-500 mt-2">Our Network of Trusted Partners</h2>
@@ -154,7 +154,7 @@
 
 {{-- Testimonials placeholder --}}
 <section class="py-14 bg-y2b-light/40">
-    <div class="max-w-7xl mx-auto px-4 text-center">
+    <div class="max-w-7xl 2xl:max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 class="text-3xl font-bold text-y2b-primary">Testimonials</h2>
         <h2 class="text-xl text-gray-600 mt-2 mb-10">What Our Clients Say?</h2>
         <div class="bg-white rounded-xl shadow-md p-8 max-w-2xl mx-auto">
@@ -174,7 +174,7 @@
 {{-- Localities --}}
 @if(count($localities) > 0)
 <section class="py-10 md:py-14 overflow-hidden">
-    <div class="max-w-7xl mx-auto px-4">
+    <div class="max-w-7xl 2xl:max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-6 md:mb-8">
             <h2 class="text-2xl md:text-3xl font-bold text-y2b-primary">Our Localities</h2>
             <p class="text-base md:text-xl text-gray-500 mt-2">Explore Properties By Localities</p>
@@ -199,7 +199,7 @@
 
         @foreach($localities as $name => $properties)
             <div data-locality-panel="{{ $name }}"
-                 class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 {{ $loop->first ? '' : 'hidden' }}">
+                 class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-2.5 sm:gap-3 {{ $loop->first ? '' : 'hidden' }}">
                 @foreach($properties as $propertyItem)
                     <a href="{{ route('properties.show', $propertyItem['slug']) }}"
                        class="locality-property-link flex items-start gap-2.5 text-sm text-gray-700 hover:text-y2b-primary bg-white border border-gray-200 rounded-lg px-3 py-3 sm:px-4 sm:py-3 hover:border-y2b-primary hover:shadow-sm transition min-w-0">
@@ -215,7 +215,7 @@
 
 {{-- Consultation + Featured carousel --}}
 <section id="consultation" class="consultation-section py-16">
-    <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 items-start">
+    <div class="max-w-7xl 2xl:max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
         <div class="text-white">
             <h2 class="text-3xl font-bold">Book Your Appointment</h2>
             <h2 class="text-xl text-blue-200 mt-1 mb-8">Free Consultation</h2>
