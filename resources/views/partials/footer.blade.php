@@ -1,5 +1,5 @@
 <footer class="bg-y2b-footer text-gray-300">
-    <div class="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+    <div class="max-w-7xl 2xl:max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8 py-12 grid md:grid-cols-2 lg:grid-cols-4 gap-10">
         <div>
             <a href="{{ route('home') }}">
                 <img src="{{ site_asset(config('site.logo_footer')) }}" alt="{{ config('site.name') }}" class="h-12 mb-4">

@@ -1,7 +1,7 @@
 @props(['usps' => []])
 
 <section class="py-12 {{ $attributes->get('class', 'bg-gray-50') }}">
-    <div class="max-w-7xl mx-auto px-4">
+    <div class="max-w-7xl 2xl:max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8">
         <div id="usp-carousel" class="usp-carousel scroll-smooth">
             @foreach($usps as $usp)
                 <div class="usp-carousel-item">
