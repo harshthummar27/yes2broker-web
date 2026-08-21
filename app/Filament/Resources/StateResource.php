@@ -6,6 +6,7 @@ use App\Filament\Resources\StateResource\Pages;
 use App\Models\State;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -58,31 +59,67 @@ class StateResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label('Order')
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
+                    ->placeholder('—')
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('sort_order')
             ->reorderable('sort_order')
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->successNotification(
+                        Notification::make()
+                            ->success()
+                            ->title('State deleted')
+                            ->body('The state has been successfully removed.')
+                    )
+                    ->failureNotification(
+                        Notification::make()
+                            ->danger()
+                            ->title('Failed to delete state')
+                            ->body('An error occurred while deleting the state. Please check related records.')
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->successNotification(
+                            Notification::make()
+                                ->success()
+                                ->title('States deleted')
+                                ->body('The selected states were successfully removed.')
+                        )
+                        ->failureNotification(
+                            Notification::make()
+                                ->danger()
+                                ->title('Failed to delete states')
+                                ->body('Some or all selected states could not be deleted.')
+                        ),
                 ]),
+            ])
+            ->emptyStateHeading('No states found')
+            ->emptyStateDescription('Create a new state to organize properties and cities.')
+            ->emptyStateIcon('heroicon-o-globe-asia-australia')
+            ->emptyStateActions([
+                Tables\Actions\CreateAction::make()
+                    ->label('Add New State')
+                    ->icon('heroicon-m-plus'),
             ]);
     }
 

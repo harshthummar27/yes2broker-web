@@ -118,7 +118,7 @@
 <section class="py-10 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-2xl font-bold text-y2b-primary mb-4">Descriptions</h2>
-        <p class="text-gray-600 leading-relaxed max-w-4xl break-words">{{ $property['description'] }}</p>
+        <p class="text-gray-600 leading-relaxed break-words">{{ $property['description'] }}</p>
     </div>
 </section>
 

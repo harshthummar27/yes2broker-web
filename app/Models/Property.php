@@ -19,6 +19,43 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
+/**
+ * @property int $id
+ * @property string $slug
+ * @property string $title
+ * @property string|null $location
+ * @property string|null $address_line_1
+ * @property string|null $address_line_2
+ * @property string|null $locality
+ * @property string|null $bhk
+ * @property string|null $area
+ * @property float|string|null $project_area_value
+ * @property string|null $project_area_unit
+ * @property string|null $possession
+ * @property \Carbon\Carbon|null $possession_date
+ * @property string|null $price
+ * @property int|null $price_min_amount
+ * @property int|null $price_max_amount
+ * @property float|string|null $price_min_lakhs
+ * @property string|null $image
+ * @property array|null $gallery
+ * @property string|null $description
+ * @property array|null $overview
+ * @property array|null $amenities
+ * @property array|null $faqs
+ * @property string|null $map_embed_url
+ * @property string|null $street_view_embed_url
+ * @property bool $show_street_view
+ * @property string|null $brochure_url
+ * @property string|null $city
+ * @property string|null $state
+ * @property string|null $property_type
+ * @property bool $is_new
+ * @property bool $is_trending
+ * @property bool $is_active
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ */
 class Property extends Model
 {
     protected $fillable = [
@@ -111,9 +148,9 @@ class Property extends Model
                     $property->price_min_amount,
                     $property->price_max_amount
                 );
-                $property->price_min_lakhs = IndianPrice::toMinLakhs($property->price_min_amount);
+                $property->price_min_lakhs = (string) IndianPrice::toMinLakhs($property->price_min_amount);
             } elseif (filled($property->price)) {
-                $property->price_min_lakhs = self::parsePriceMinLakhs($property->price);
+                $property->price_min_lakhs = (string) self::parsePriceMinLakhs($property->price);
             }
 
             if (filled($property->possession_date) && ! self::isReadyToMove($property->possession)) {
@@ -176,6 +213,14 @@ class Property extends Model
 
         static::saved(function (Property $property): void {
             app(\App\Services\PropertyListingUnitService::class)->syncPropertyFromOverviewJson($property);
+        });
+
+        static::deleting(function (Property $property): void {
+            try {
+                $property->listingUnits()->delete();
+            } catch (\Throwable $e) {
+                report($e);
+            }
         });
     }
 
@@ -323,37 +368,85 @@ class Property extends Model
     {
         $filters = array_filter($filters, fn ($value) => $value !== null && $value !== '');
 
-        if (! empty($filters['city'])) {
+        if (! empty($filters['city']) && strtolower((string) $filters['city']) !== 'all') {
+            $citySlug = strtolower(trim((string) $filters['city']));
             $city = City::query()
                 ->active()
-                ->where('slug', strtolower((string) $filters['city']))
+                ->where('slug', $citySlug)
                 ->first();
 
-            if ($city !== null) {
-                $query->whereRaw('LOWER(city) = ?', [strtolower($city->name)]);
-            }
-        }
-
-        if (! empty($filters['area'])) {
-            $area = strtolower($filters['area']);
-            $query->where(function (Builder $builder) use ($area): void {
-                $builder->whereRaw('LOWER(location) LIKE ?', ["%{$area}%"])
-                    ->orWhereRaw('LOWER(title) LIKE ?', ["%{$area}%"]);
+            $cityName = $city?->name ?? $filters['city'];
+            $query->where(function (Builder $builder) use ($cityName, $citySlug): void {
+                $builder->whereRaw('LOWER(city) = ?', [strtolower((string) $cityName)])
+                    ->orWhereRaw('LOWER(city) = ?', [$citySlug])
+                    ->orWhereRaw('LOWER(location) LIKE ?', ['%'.strtolower((string) $cityName).'%']);
             });
         }
 
-        if (! empty($filters['type'])) {
-            $propertyType = PropertyType::query()
-                ->active()
-                ->where('slug', (string) $filters['type'])
-                ->first();
+        if (! empty($filters['area'])) {
+            $area = strtolower(trim((string) $filters['area']));
+            $terms = array_filter(explode(' ', $area), fn ($term) => strlen($term) >= 2);
 
-            $needle = $propertyType?->filter_keyword ?? (string) $filters['type'];
-            $query->whereRaw('LOWER(bhk) LIKE ?', ['%'.strtolower($needle).'%']);
+            $query->where(function (Builder $builder) use ($area, $terms): void {
+                $builder->whereRaw('LOWER(location) LIKE ?', ["%{$area}%"])
+                    ->orWhereRaw('LOWER(title) LIKE ?', ["%{$area}%"])
+                    ->orWhereRaw('LOWER(locality) LIKE ?', ["%{$area}%"])
+                    ->orWhereRaw('LOWER(address_line_1) LIKE ?', ["%{$area}%"])
+                    ->orWhereRaw('LOWER(address_line_2) LIKE ?', ["%{$area}%"])
+                    ->orWhereRaw('LOWER(bhk) LIKE ?', ["%{$area}%"]);
+
+                if (count($terms) > 1) {
+                    $builder->orWhere(function (Builder $sub) use ($terms): void {
+                        foreach ($terms as $term) {
+                            $sub->where(function (Builder $w) use ($term): void {
+                                $w->whereRaw('LOWER(location) LIKE ?', ["%{$term}%"])
+                                    ->orWhereRaw('LOWER(title) LIKE ?', ["%{$term}%"])
+                                    ->orWhereRaw('LOWER(locality) LIKE ?', ["%{$term}%"])
+                                    ->orWhereRaw('LOWER(bhk) LIKE ?', ["%{$term}%"]);
+                            });
+                        }
+                    });
+                }
+            });
         }
 
-        if (! empty($filters['budget'])) {
-            $maxBudgetLakhs = HomePageData::budgetMaxLakhs($filters['budget']);
+        if (! empty($filters['type']) && strtolower((string) $filters['type']) !== 'all') {
+            $typeSlug = strtolower(trim((string) $filters['type']));
+            $propertyType = PropertyType::query()
+                ->active()
+                ->where('slug', $typeSlug)
+                ->first();
+
+            $needle = strtolower($propertyType?->filter_keyword ?: $typeSlug);
+            $typeName = strtolower($propertyType?->name ?: $typeSlug);
+
+            $synonyms = match ($typeSlug) {
+                'apartment' => ['apartment', 'flat', 'bhk', 'penthouse'],
+                'villa' => ['villa', 'bungalow', 'row house', 'tenement'],
+                'home' => ['home', 'house', 'apartment', 'flat', 'villa', 'bhk'],
+                'bungalow' => ['bungalow', 'villa', 'tenement', 'row house'],
+                'office' => ['office', 'commercial', 'corporate', 'work space'],
+                'showroom' => ['showroom', 'commercial', 'retail'],
+                'shop' => ['shop', 'retail', 'commercial', 'store'],
+                'farmhouse' => ['farmhouse', 'farm house', 'plot', 'estate'],
+                'land' => ['land', 'plot', 'open land'],
+                default => [$needle, $typeName, $typeSlug],
+            };
+
+            $query->where(function (Builder $builder) use ($synonyms, $needle, $typeName, $typeSlug): void {
+                $builder->whereRaw('LOWER(property_type) = ?', [$typeSlug])
+                    ->orWhereRaw('LOWER(property_type) = ?', [$typeName]);
+
+                foreach ($synonyms as $synonym) {
+                    $builder->orWhereRaw('LOWER(bhk) LIKE ?', ["%{$synonym}%"])
+                        ->orWhereRaw('LOWER(title) LIKE ?', ["%{$synonym}%"])
+                        ->orWhereRaw('LOWER(property_type) LIKE ?', ["%{$synonym}%"]);
+                }
+            });
+        }
+
+        if (! empty($filters['budget']) && strtolower((string) $filters['budget']) !== 'all') {
+            $maxBudgetLakhs = HomePageData::budgetMaxLakhs((string) $filters['budget']);
 
             if ($maxBudgetLakhs !== null) {
                 $query->where('price_min_lakhs', '>', 0)
@@ -439,7 +532,7 @@ class Property extends Model
             return $path;
         }
 
-        return Storage::disk('public')->url(ltrim($path, '/'));
+        return Storage::url(ltrim($path, '/'));
     }
 
     public function galleryUrls(): array
@@ -593,7 +686,7 @@ class Property extends Model
             return $this->brochure_url;
         }
 
-        return Storage::disk('public')->url(ltrim($this->brochure_url, '/'));
+        return Storage::url(ltrim($this->brochure_url, '/'));
     }
 
     public function resolveStreetViewEmbedUrl(): ?string

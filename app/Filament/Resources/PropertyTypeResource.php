@@ -6,6 +6,7 @@ use App\Filament\Resources\PropertyTypeResource\Pages;
 use App\Models\PropertyType;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -64,16 +65,20 @@ class PropertyTypeResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('filter_keyword')
                     ->label('Keyword')
-                    ->searchable(),
+                    ->searchable()
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label('Order')
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean(),
@@ -82,12 +87,44 @@ class PropertyTypeResource extends Resource
             ->reorderable('sort_order')
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->successNotification(
+                        Notification::make()
+                            ->success()
+                            ->title('Property type deleted')
+                            ->body('The property type was successfully deleted.')
+                    )
+                    ->failureNotification(
+                        Notification::make()
+                            ->danger()
+                            ->title('Failed to delete property type')
+                            ->body('An error occurred while deleting the property type.')
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->successNotification(
+                            Notification::make()
+                                ->success()
+                                ->title('Property types deleted')
+                                ->body('The selected property types were successfully deleted.')
+                        )
+                        ->failureNotification(
+                            Notification::make()
+                                ->danger()
+                                ->title('Failed to delete property types')
+                                ->body('Some or all selected property types could not be deleted.')
+                        ),
                 ]),
+            ])
+            ->emptyStateHeading('No property types found')
+            ->emptyStateDescription('Create property types like Apartment, Villa, Plot, or Penthouse.')
+            ->emptyStateIcon('heroicon-o-tag')
+            ->emptyStateActions([
+                Tables\Actions\CreateAction::make()
+                    ->label('Add Property Type')
+                    ->icon('heroicon-m-plus'),
             ]);
     }
 

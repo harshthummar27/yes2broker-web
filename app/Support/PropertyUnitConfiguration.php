@@ -294,7 +294,7 @@ class PropertyUnitConfiguration
             $sizeRange = self::formatSizeRange($unitConfigurations);
             if (filled($sizeRange)) {
                 $items[] = [
-                    'icon' => 'project-area',
+                    'icon' => 'sizes',
                     'label' => 'Sizes',
                     'value' => $sizeRange,
                 ];

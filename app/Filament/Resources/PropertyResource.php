@@ -10,8 +10,10 @@ use App\Support\MapEmbed;
 use App\Support\ProjectAreaUnit;
 use App\Support\PropertyOverview;
 use App\Support\PropertyUnitConfiguration;
+use App\Support\SiteAsset;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -447,35 +449,58 @@ class PropertyResource extends Resource
                 Tables\Columns\ImageColumn::make('image')
                     ->label('Image')
                     ->square()
-                    ->getStateUsing(fn (Property $record): string => $record->image_url),
+                    ->defaultImageUrl(fn (): string => SiteAsset::url((string) config('site.default_property_image', 'images/site/property-default-image.png')))
+                    ->getStateUsing(function (Property $record): string {
+                        try {
+                            return (string) ($record->image_url ?? '');
+                        } catch (\Throwable $e) {
+                            report($e);
+                            return '';
+                        }
+                    }),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
                     ->sortable()
-                    ->limit(40),
+                    ->limit(40)
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('locality')
                     ->searchable()
+                    ->placeholder('—')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('location')
                     ->label('Full address')
-                    ->getStateUsing(fn (Property $record): string => $record->displayLocation())
+                    ->getStateUsing(function (Property $record): string {
+                        try {
+                            return (string) $record->displayLocation();
+                        } catch (\Throwable $e) {
+                            report($e);
+                            return (string) ($record->location ?? '—');
+                        }
+                    })
                     ->searchable(['address_line_1', 'address_line_2', 'locality', 'location'])
                     ->limit(35)
+                    ->placeholder('—')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('bhk')
                     ->label('Configuration')
                     ->searchable()
+                    ->placeholder('—')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('area')
                     ->label('Project Area')
                     ->searchable()
+                    ->placeholder('—')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('price')
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('city')
                     ->badge()
+                    ->placeholder('—')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('property_type')
                     ->label('Type')
+                    ->placeholder('—')
                     ->toggleable(),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Published')
@@ -491,6 +516,7 @@ class PropertyResource extends Resource
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
+                    ->placeholder('—')
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('title')
@@ -498,19 +524,80 @@ class PropertyResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label('Published'),
                 Tables\Filters\SelectFilter::make('city')
-                    ->options(fn (): array => app(LookupOptionService::class)->citiesForAdmin()),
+                    ->options(function (): array {
+                        try {
+                            return app(LookupOptionService::class)->citiesForAdmin();
+                        } catch (\Throwable $e) {
+                            report($e);
+                            return [];
+                        }
+                    }),
                 Tables\Filters\SelectFilter::make('property_type')
                     ->label('Type')
-                    ->options(fn (): array => app(LookupOptionService::class)->propertyTypesForAdmin()),
+                    ->options(function (): array {
+                        try {
+                            return app(LookupOptionService::class)->propertyTypesForAdmin();
+                        } catch (\Throwable $e) {
+                            report($e);
+                            return [];
+                        }
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->before(function (Property $record): void {
+                        try {
+                            $record->listingUnits()->delete();
+                        } catch (\Throwable $e) {
+                            report($e);
+                        }
+                    })
+                    ->successNotification(
+                        Notification::make()
+                            ->success()
+                            ->title('Property deleted')
+                            ->body('The property was successfully deleted.')
+                    )
+                    ->failureNotification(
+                        Notification::make()
+                            ->danger()
+                            ->title('Failed to delete property')
+                            ->body('An error occurred while deleting the property.')
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->before(function (\Illuminate\Database\Eloquent\Collection $records): void {
+                            try {
+                                $ids = $records->pluck('id')->all();
+                                \App\Models\PropertyListingUnit::query()->whereIn('property_id', $ids)->delete();
+                            } catch (\Throwable $e) {
+                                report($e);
+                            }
+                        })
+                        ->successNotification(
+                            Notification::make()
+                                ->success()
+                                ->title('Properties deleted')
+                                ->body('Selected properties were successfully deleted.')
+                        )
+                        ->failureNotification(
+                            Notification::make()
+                                ->danger()
+                                ->title('Failed to delete properties')
+                                ->body('An error occurred while deleting selected properties.')
+                        ),
                 ]),
+            ])
+            ->emptyStateHeading('No properties found')
+            ->emptyStateDescription('There are currently no properties matching your search or filters.')
+            ->emptyStateIcon('heroicon-o-building-office-2')
+            ->emptyStateActions([
+                Tables\Actions\CreateAction::make()
+                    ->label('Add New Property')
+                    ->icon('heroicon-m-plus'),
             ]);
     }
 

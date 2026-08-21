@@ -7,6 +7,7 @@ use App\Models\City;
 use App\Models\Locality;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -30,7 +31,14 @@ class LocalityResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('city_id')
                             ->label('City')
-                            ->options(fn (): array => City::query()->active()->ordered()->pluck('name', 'id')->all())
+                            ->options(function (): array {
+                                try {
+                                    return City::query()->active()->ordered()->pluck('name', 'id')->all();
+                                } catch (\Throwable $e) {
+                                    report($e);
+                                    return [];
+                                }
+                            })
                             ->required()
                             ->searchable()
                             ->native(false),
@@ -66,38 +74,82 @@ class LocalityResource extends Resource
                 Tables\Columns\TextColumn::make('city.name')
                     ->label('City')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable()
+                    ->placeholder('—')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label('Order')
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
+                    ->placeholder('—')
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('sort_order')
             ->filters([
                 Tables\Filters\SelectFilter::make('city_id')
                     ->label('City')
-                    ->options(fn (): array => City::query()->active()->ordered()->pluck('name', 'id')->all()),
+                    ->options(function (): array {
+                        try {
+                            return City::query()->active()->ordered()->pluck('name', 'id')->all();
+                        } catch (\Throwable $e) {
+                            report($e);
+                            return [];
+                        }
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->successNotification(
+                        Notification::make()
+                            ->success()
+                            ->title('Locality deleted')
+                            ->body('The locality has been successfully removed.')
+                    )
+                    ->failureNotification(
+                        Notification::make()
+                            ->danger()
+                            ->title('Failed to delete locality')
+                            ->body('An error occurred while deleting the locality. Please check related records.')
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->successNotification(
+                            Notification::make()
+                                ->success()
+                                ->title('Localities deleted')
+                                ->body('The selected localities were successfully removed.')
+                        )
+                        ->failureNotification(
+                            Notification::make()
+                                ->danger()
+                                ->title('Failed to delete localities')
+                                ->body('Some or all selected localities could not be deleted.')
+                        ),
                 ]),
+            ])
+            ->emptyStateHeading('No localities found')
+            ->emptyStateDescription('Create localities and link them to cities.')
+            ->emptyStateIcon('heroicon-o-map')
+            ->emptyStateActions([
+                Tables\Actions\CreateAction::make()
+                    ->label('Add New Locality')
+                    ->icon('heroicon-m-plus'),
             ]);
     }
 

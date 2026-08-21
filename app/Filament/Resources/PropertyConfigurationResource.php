@@ -6,6 +6,7 @@ use App\Filament\Resources\PropertyConfigurationResource\Pages;
 use App\Models\PropertyConfiguration;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -64,13 +65,16 @@ class PropertyConfigurationResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->label('Configuration / BHK')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable()
+                    ->placeholder('—')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label('Order')
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean(),
@@ -79,12 +83,44 @@ class PropertyConfigurationResource extends Resource
             ->reorderable('sort_order')
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->successNotification(
+                        Notification::make()
+                            ->success()
+                            ->title('Configuration deleted')
+                            ->body('The configuration was successfully deleted.')
+                    )
+                    ->failureNotification(
+                        Notification::make()
+                            ->danger()
+                            ->title('Failed to delete configuration')
+                            ->body('An error occurred while deleting the configuration.')
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->successNotification(
+                            Notification::make()
+                                ->success()
+                                ->title('Configurations deleted')
+                                ->body('The selected configurations were successfully deleted.')
+                        )
+                        ->failureNotification(
+                            Notification::make()
+                                ->danger()
+                                ->title('Failed to delete configurations')
+                                ->body('Some or all selected configurations could not be deleted.')
+                        ),
                 ]),
+            ])
+            ->emptyStateHeading('No configurations found')
+            ->emptyStateDescription('Create configuration options like 1 BHK, 2 BHK, Villa, Studio, etc.')
+            ->emptyStateIcon('heroicon-o-home-modern')
+            ->emptyStateActions([
+                Tables\Actions\CreateAction::make()
+                    ->label('Add Configuration')
+                    ->icon('heroicon-m-plus'),
             ]);
     }
 

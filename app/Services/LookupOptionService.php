@@ -24,13 +24,18 @@ class LookupOptionService
      */
     public function citiesForSearch(): array
     {
-        return Cache::remember('lookup.cities.search', self::CACHE_TTL_SECONDS, function (): array {
-            return City::query()
-                ->active()
-                ->ordered()
-                ->pluck('name', 'slug')
-                ->all();
-        });
+        try {
+            return Cache::remember('lookup.cities.search', self::CACHE_TTL_SECONDS, function (): array {
+                return City::query()
+                    ->active()
+                    ->ordered()
+                    ->pluck('name', 'slug')
+                    ->all();
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return ['ahmedabad' => 'Ahmedabad'];
+        }
     }
 
     /**
@@ -38,13 +43,18 @@ class LookupOptionService
      */
     public function citiesForAdmin(): array
     {
-        return Cache::remember('lookup.cities.admin', self::CACHE_TTL_SECONDS, function (): array {
-            return City::query()
-                ->active()
-                ->ordered()
-                ->pluck('name', 'name')
-                ->all();
-        });
+        try {
+            return Cache::remember('lookup.cities.admin', self::CACHE_TTL_SECONDS, function (): array {
+                return City::query()
+                    ->active()
+                    ->ordered()
+                    ->pluck('name', 'name')
+                    ->all();
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return ['Ahmedabad' => 'Ahmedabad'];
+        }
     }
 
     public function defaultCitySlug(): string
@@ -62,13 +72,18 @@ class LookupOptionService
      */
     public function statesForAdmin(): array
     {
-        return Cache::remember('lookup.states.admin', self::CACHE_TTL_SECONDS, function (): array {
-            return State::query()
-                ->active()
-                ->ordered()
-                ->pluck('name', 'name')
-                ->all();
-        });
+        try {
+            return Cache::remember('lookup.states.admin', self::CACHE_TTL_SECONDS, function (): array {
+                return State::query()
+                    ->active()
+                    ->ordered()
+                    ->pluck('name', 'name')
+                    ->all();
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return ['Gujarat' => 'Gujarat'];
+        }
     }
 
     public function defaultStateName(): string
@@ -85,25 +100,30 @@ class LookupOptionService
             return [];
         }
 
-        $cacheKey = 'lookup.localities.admin.'.Str::slug($cityName);
+        try {
+            $cacheKey = 'lookup.localities.admin.'.Str::slug($cityName);
 
-        return Cache::remember($cacheKey, self::CACHE_TTL_SECONDS, function () use ($cityName): array {
-            $city = City::query()
-                ->active()
-                ->where('name', $cityName)
-                ->first();
+            return Cache::remember($cacheKey, self::CACHE_TTL_SECONDS, function () use ($cityName): array {
+                $city = City::query()
+                    ->active()
+                    ->where('name', $cityName)
+                    ->first();
 
-            if ($city === null) {
-                return [];
-            }
+                if ($city === null) {
+                    return [];
+                }
 
-            return Locality::query()
-                ->active()
-                ->where('city_id', $city->id)
-                ->ordered()
-                ->pluck('name', 'name')
-                ->all();
-        });
+                return Locality::query()
+                    ->active()
+                    ->where('city_id', $city->id)
+                    ->ordered()
+                    ->pluck('name', 'name')
+                    ->all();
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return [];
+        }
     }
 
     /**
@@ -111,13 +131,18 @@ class LookupOptionService
      */
     public function configurationsForAdmin(): array
     {
-        return Cache::remember('lookup.configurations.admin', self::CACHE_TTL_SECONDS, function (): array {
-            return PropertyConfiguration::query()
-                ->active()
-                ->ordered()
-                ->pluck('name', 'name')
-                ->all();
-        });
+        try {
+            return Cache::remember('lookup.configurations.admin', self::CACHE_TTL_SECONDS, function (): array {
+                return PropertyConfiguration::query()
+                    ->active()
+                    ->ordered()
+                    ->pluck('name', 'name')
+                    ->all();
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return [];
+        }
     }
 
     /**
@@ -125,13 +150,18 @@ class LookupOptionService
      */
     public function projectUnitsForAdmin(): array
     {
-        return Cache::remember('lookup.project_units.admin', self::CACHE_TTL_SECONDS, function (): array {
-            return ProjectUnit::query()
-                ->active()
-                ->ordered()
-                ->pluck('name', 'name')
-                ->all();
-        });
+        try {
+            return Cache::remember('lookup.project_units.admin', self::CACHE_TTL_SECONDS, function (): array {
+                return ProjectUnit::query()
+                    ->active()
+                    ->ordered()
+                    ->pluck('name', 'name')
+                    ->all();
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return [ProjectAreaUnit::DEFAULT_UNIT => ProjectAreaUnit::DEFAULT_UNIT];
+        }
     }
 
     public function defaultProjectUnitName(): string
@@ -144,13 +174,18 @@ class LookupOptionService
      */
     public function amenityOptionsForAdmin(): array
     {
-        return Cache::remember('lookup.amenities.admin', self::CACHE_TTL_SECONDS, function (): array {
-            return AmenityOption::query()
-                ->active()
-                ->ordered()
-                ->pluck('name', 'name')
-                ->all();
-        });
+        try {
+            return Cache::remember('lookup.amenities.admin', self::CACHE_TTL_SECONDS, function (): array {
+                return AmenityOption::query()
+                    ->active()
+                    ->ordered()
+                    ->pluck('name', 'name')
+                    ->all();
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return [];
+        }
     }
 
     /**
@@ -158,15 +193,20 @@ class LookupOptionService
      */
     public function propertyTypesForSearch(): array
     {
-        return Cache::remember('lookup.property_types.search', self::CACHE_TTL_SECONDS, function (): array {
-            $options = ['' => 'Select Type'];
+        try {
+            return Cache::remember('lookup.property_types.search', self::CACHE_TTL_SECONDS, function (): array {
+                $options = ['' => 'Select Type'];
 
-            foreach (PropertyType::query()->active()->ordered()->get() as $type) {
-                $options[$type->slug] = $type->name;
-            }
+                foreach (PropertyType::query()->active()->ordered()->get() as $type) {
+                    $options[$type->slug] = $type->name;
+                }
 
-            return $options;
-        });
+                return $options;
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return ['' => 'Select Type'];
+        }
     }
 
     /**
@@ -174,13 +214,18 @@ class LookupOptionService
      */
     public function propertyTypesForAdmin(): array
     {
-        return Cache::remember('lookup.property_types.admin', self::CACHE_TTL_SECONDS, function (): array {
-            return PropertyType::query()
-                ->active()
-                ->ordered()
-                ->pluck('name', 'name')
-                ->all();
-        });
+        try {
+            return Cache::remember('lookup.property_types.admin', self::CACHE_TTL_SECONDS, function (): array {
+                return PropertyType::query()
+                    ->active()
+                    ->ordered()
+                    ->pluck('name', 'name')
+                    ->all();
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return [];
+        }
     }
 
     /**

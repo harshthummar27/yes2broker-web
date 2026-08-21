@@ -6,6 +6,7 @@ use App\Filament\Resources\ProjectUnitResource\Pages;
 use App\Models\ProjectUnit;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -60,13 +61,16 @@ class ProjectUnitResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->label('Unit')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable()
+                    ->placeholder('—')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label('Order')
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean(),
@@ -75,12 +79,44 @@ class ProjectUnitResource extends Resource
             ->reorderable('sort_order')
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->successNotification(
+                        Notification::make()
+                            ->success()
+                            ->title('Project unit deleted')
+                            ->body('The project unit was successfully deleted.')
+                    )
+                    ->failureNotification(
+                        Notification::make()
+                            ->danger()
+                            ->title('Failed to delete project unit')
+                            ->body('An error occurred while deleting the project unit.')
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->successNotification(
+                            Notification::make()
+                                ->success()
+                                ->title('Project units deleted')
+                                ->body('The selected project units were successfully deleted.')
+                        )
+                        ->failureNotification(
+                            Notification::make()
+                                ->danger()
+                                ->title('Failed to delete project units')
+                                ->body('Some or all selected project units could not be deleted.')
+                        ),
                 ]),
+            ])
+            ->emptyStateHeading('No project units found')
+            ->emptyStateDescription('Create project units like Sq. Ft., Sq. Yards, Acres, etc.')
+            ->emptyStateIcon('heroicon-o-square-3-stack-3d')
+            ->emptyStateActions([
+                Tables\Actions\CreateAction::make()
+                    ->label('Add Project Unit')
+                    ->icon('heroicon-m-plus'),
             ]);
     }
 

@@ -8,6 +8,7 @@ use App\Models\Property;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -152,36 +153,50 @@ class HomePromoItemResource extends Resource
                 Tables\Columns\ImageColumn::make('banner_image')
                     ->label('Preview')
                     ->square()
-                    ->getStateUsing(fn (HomePromoItem $record): string => $record->imageUrl()),
+                    ->getStateUsing(function (HomePromoItem $record): string {
+                        try {
+                            return (string) $record->imageUrl();
+                        } catch (\Throwable $e) {
+                            report($e);
+                            return '';
+                        }
+                    }),
                 Tables\Columns\TextColumn::make('placement')
                     ->label('Show On')
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => $state === HomePromoItem::PLACEMENT_PROPERTIES
                         ? 'All Properties'
                         : 'Homepage')
-                    ->color(fn (string $state): string => $state === HomePromoItem::PLACEMENT_PROPERTIES ? 'warning' : 'primary'),
+                    ->color(fn (string $state): string => $state === HomePromoItem::PLACEMENT_PROPERTIES ? 'warning' : 'primary')
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('type')
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => ucfirst($state))
-                    ->color(fn (string $state): string => $state === HomePromoItem::TYPE_BANNER ? 'info' : 'success'),
+                    ->color(fn (string $state): string => $state === HomePromoItem::TYPE_BANNER ? 'info' : 'success')
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('slogan')
                     ->label('Headline / Slogan')
                     ->limit(40)
-                    ->searchable(),
+                    ->searchable()
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('property.title')
                     ->label('Property')
                     ->limit(30)
+                    ->placeholder('—')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('link_action')
                     ->label('On Click')
                     ->formatStateUsing(fn (?string $state, HomePromoItem $record): string => $record->isBanner() && $record->isFormBanner() ? 'Form' : 'URL')
+                    ->placeholder('—')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('link_url')
                     ->label('Link')
                     ->limit(35)
+                    ->placeholder('—')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('sort_order')
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Published')
                     ->boolean(),
@@ -204,12 +219,44 @@ class HomePromoItemResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->successNotification(
+                        Notification::make()
+                            ->success()
+                            ->title('Promo deleted')
+                            ->body('The promo has been deleted.')
+                    )
+                    ->failureNotification(
+                        Notification::make()
+                            ->danger()
+                            ->title('Failed to delete promo')
+                            ->body('An error occurred while deleting the promo.')
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->successNotification(
+                            Notification::make()
+                                ->success()
+                                ->title('Promos deleted')
+                                ->body('The selected promos were successfully deleted.')
+                        )
+                        ->failureNotification(
+                            Notification::make()
+                                ->danger()
+                                ->title('Failed to delete promos')
+                                ->body('An error occurred while deleting the selected promos.')
+                        ),
                 ]),
+            ])
+            ->emptyStateHeading('No promos found')
+            ->emptyStateDescription('Create a new promo banner or property highlight.')
+            ->emptyStateIcon('heroicon-o-photo')
+            ->emptyStateActions([
+                Tables\Actions\CreateAction::make()
+                    ->label('Add New Promo')
+                    ->icon('heroicon-m-plus'),
             ]);
     }
 
