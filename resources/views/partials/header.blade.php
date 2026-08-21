@@ -1,4 +1,5 @@
 {{-- Top bar --}}
+<<<<<<< HEAD
 <div class="bg-y2b-primary text-white text-xs xl:text-sm">
     <div class="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between gap-3">
         <div class="flex items-center gap-3 sm:gap-4 xl:gap-6 shrink-0">
@@ -9,11 +10,27 @@
             <a href="{{ config('site.phone_href') }}" class="flex items-center gap-1.5 hover:text-y2b-light transition">
                 <svg class="w-3.5 h-3.5 xl:w-4 xl:h-4" fill="currentColor" viewBox="0 0 448 512"><path d="M400 32H48A48 48 0 0 0 0 80v352a48 48 0 0 0 48 48h352a48 48 0 0 0 48-48V80a48 48 0 0 0-48-48zm-16.39 307.37l-15 65A15 15 0 0 1 354 416C194 416 64 286.29 64 126a15.7 15.7 0 0 1 11.63-14.61l65-15A18.23 18.23 0 0 1 144 96a16.27 16.27 0 0 1 13.79 9.09l30 70A17.9 17.9 0 0 1 189 181a17 17 0 0 1-5.5 11.61l-37.89 31a231.91 231.91 0 0 0 110.78 110.78l31-37.89A17 17 0 0 1 299 291a17.85 17.85 0 0 1 5.91 1.21l70 30A16.25 16.25 0 0 1 384 336a17.41 17.41 0 0 1-.39 3.37z"/></svg>
                 <span>{{ config('site.phone') }}</span>
+=======
+<div class="bg-y2b-primary text-white text-sm xl:text-base">
+    <div class="w-full px-4 sm:px-6 md:px-8 py-2 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-4 xl:gap-6">
+            <a href="mailto:{{ config('site.email') }}" class="flex items-center gap-2 hover:text-y2b-light transition">
+                <svg class="w-4 h-4 xl:w-5 xl:h-5" fill="currentColor" viewBox="0 0 512 512"><path d="M464 64H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm0 48v40.805c-22.422 18.259-58.168 46.651-134.587 106.49-16.841 13.247-50.201 45.072-73.413 44.701-23.208.375-56.579-31.459-73.413-44.701C106.18 199.465 70.425 171.067 48 152.805V112h416zM48 400V214.398c22.914 18.251 55.409 43.862 104.938 82.646 21.857 17.205 60.134 55.186 103.062 54.955 42.717.231 80.509-37.199 103.053-54.947 49.528-38.783 82.032-64.401 104.947-82.653V400H48z"/></svg>
+                {{ config('site.email') }}
+            </a>
+            <a href="{{ config('site.phone_href') }}" class="flex items-center gap-2 hover:text-y2b-light transition">
+                <svg class="w-4 h-4 xl:w-5 xl:h-5" fill="currentColor" viewBox="0 0 448 512"><path d="M400 32H48A48 48 0 0 0 0 80v352a48 48 0 0 0 48 48h352a48 48 0 0 0 48-48V80a48 48 0 0 0-48-48zm-16.39 307.37l-15 65A15 15 0 0 1 354 416C194 416 64 286.29 64 126a15.7 15.7 0 0 1 11.63-14.61l65-15A18.23 18.23 0 0 1 144 96a16.27 16.27 0 0 1 13.79 9.09l30 70A17.9 17.9 0 0 1 189 181a17 17 0 0 1-5.5 11.61l-37.89 31a231.91 231.91 0 0 0 110.78 110.78l31-37.89A17 17 0 0 1 299 291a17.85 17.85 0 0 1 5.91 1.21l70 30A16.25 16.25 0 0 1 384 336a17.41 17.41 0 0 1-.39 3.37z"/></svg>
+                {{ config('site.phone') }}
+>>>>>>> c16417786fbd38c92fdbb398edd1e66b4a1545f0
             </a>
         </div>
 
         {{-- Marquee --}}
+<<<<<<< HEAD
         <div class="hidden md:flex flex-1 min-w-0 overflow-hidden mx-3 xl:mx-6 max-w-md xl:max-w-xl 2xl:max-w-2xl">
+=======
+        <div class="hidden md:flex flex-1 overflow-hidden mx-4 max-w-xl 2xl:max-w-2xl">
+>>>>>>> c16417786fbd38c92fdbb398edd1e66b4a1545f0
             <div class="marquee-track flex whitespace-nowrap gap-8 text-xs xl:text-sm font-medium">
                 @foreach(array_merge(config('site.marquee'), config('site.marquee')) as $text)
                     <span>{{ $text }}</span>
@@ -21,6 +38,7 @@
             </div>
         </div>
 
+<<<<<<< HEAD
         <div class="hidden lg:flex items-center gap-3 shrink-0">
             <span class="text-xs xl:text-sm text-gray-300">Follow on</span>
             @foreach(config('site.social') as $platform => $url)
@@ -31,6 +49,18 @@
                         <svg class="w-3.5 h-3.5 xl:w-4 xl:h-4" fill="currentColor" viewBox="0 0 448 512"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg>
                     @elseif($platform === 'linkedin')
                         <svg class="w-3.5 h-3.5 xl:w-4 xl:h-4" fill="currentColor" viewBox="0 0 448 512"><path d="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z"/></svg>
+=======
+        <div class="hidden lg:flex items-center gap-3 xl:gap-4">
+            <span class="text-xs xl:text-sm">Follow on</span>
+            @foreach(config('site.social') as $platform => $url)
+                <a href="{{ $url }}" target="_blank" rel="noopener" class="hover:text-y2b-light transition">
+                    @if($platform === 'facebook')
+                        <svg class="w-4 h-4 xl:w-5 xl:h-5" fill="currentColor" viewBox="0 0 512 512"><path d="M504 256C504 119 393 8 256 8S8 119 8 256c0 123.78 90.69 226.38 209.25 245V327.69h-63V256h63v-54.64c0-62.15 37-96.48 93.67-96.48 27.14 0 55.52 4.84 55.52 4.84v61h-31.28c-30.8 0-40.41 19.12-40.41 38.73V256h68.78l-11 71.69h-57.78V501C413.31 482.38 504 379.78 504 256z"/></svg>
+                    @elseif($platform === 'instagram')
+                        <svg class="w-4 h-4 xl:w-5 xl:h-5" fill="currentColor" viewBox="0 0 448 512"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg>
+                    @elseif($platform === 'linkedin')
+                        <svg class="w-4 h-4 xl:w-5 xl:h-5" fill="currentColor" viewBox="0 0 448 512"><path d="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z"/></svg>
+>>>>>>> c16417786fbd38c92fdbb398edd1e66b4a1545f0
                     @endif
                 </a>
             @endforeach
@@ -40,6 +70,7 @@
 
 {{-- Main header --}}
 <header class="bg-white shadow-sm sticky top-0 z-50">
+<<<<<<< HEAD
     <div class="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-3.5 xl:py-4 flex items-center justify-between gap-4">
         {{-- Logo --}}
         <a href="{{ route('home') }}" class="shrink-0 flex items-center">
@@ -48,6 +79,14 @@
 
         {{-- Desktop Navigation --}}
         <nav class="hidden lg:flex items-center gap-3.5 xl:gap-6 2xl:gap-8 text-[14px] xl:text-[16px] 2xl:text-[17px] font-semibold text-gray-700 whitespace-nowrap min-w-0">
+=======
+    <div class="w-full px-4 sm:px-6 md:px-8 xl:px-10 py-3 xl:py-4 2xl:py-5 flex items-center justify-between gap-4 xl:gap-8">
+        <a href="{{ route('home') }}" class="shrink-0">
+            <img src="{{ site_asset(config('site.logo')) }}" alt="{{ config('site.name') }}" class="h-12 md:h-14 xl:h-16 2xl:h-20 w-auto">
+        </a>
+
+        <nav class="hidden lg:flex items-center gap-4 lg:gap-5 xl:gap-7 2xl:gap-10 3xl:gap-12 text-sm lg:text-base xl:text-lg 2xl:text-xl 3xl:text-2xl font-semibold text-gray-700 whitespace-nowrap">
+>>>>>>> c16417786fbd38c92fdbb398edd1e66b4a1545f0
             @foreach([
                 ['route' => 'home', 'label' => 'Home'],
                 ['route' => 'about', 'label' => 'About Us'],
@@ -68,7 +107,11 @@
         <div class="flex items-center gap-3 shrink-0">
             <button type="button"
                     data-open-consultation
+<<<<<<< HEAD
                     class="hidden sm:inline-flex bg-y2b-primary hover:bg-y2b-primary-dark text-white text-xs sm:text-sm xl:text-base font-bold px-4 sm:px-5 xl:px-7 py-2.5 xl:py-3 rounded-lg transition cursor-pointer whitespace-nowrap shadow-md hover:shadow-lg shrink-0">
+=======
+                    class="hidden sm:inline-flex bg-y2b-primary hover:bg-y2b-primary-dark text-white text-sm lg:text-base xl:text-lg 2xl:text-xl 3xl:text-2xl font-semibold px-4 lg:px-5 xl:px-7 2xl:px-9 py-2 lg:py-2.5 xl:py-3.5 2xl:py-4 rounded-lg transition cursor-pointer whitespace-nowrap shadow-md hover:shadow-lg">
+>>>>>>> c16417786fbd38c92fdbb398edd1e66b4a1545f0
                 INQUIRE NOW
             </button>
 
